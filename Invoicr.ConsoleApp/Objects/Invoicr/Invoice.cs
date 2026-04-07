@@ -1,6 +1,8 @@
+using Invoicr.Repositories;
+
 namespace Invoicr.Objects;
 
-public class Invoice
+public class Invoice : IObjectWithId<int>
 {
     //primární idetifikátor faktury
     public int Id { get; set; }

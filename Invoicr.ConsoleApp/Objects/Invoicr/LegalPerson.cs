@@ -1,6 +1,9 @@
+using Invoicr.ConsoleApp.Repositories;
+using Invoicr.Repositories;
+
 namespace Invoicr.Objects;
 
-public class LegalPerson
+public class LegalPerson : IObjectWithId<int>
 {
     //Primární identifikátor
     public int Id { get; set; }
