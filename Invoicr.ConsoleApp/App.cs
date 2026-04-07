@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using Invoicr.Managers;
 using Invoicr.Objects;
@@ -184,124 +185,15 @@ public class App
     void AddSupplier()
     {
         ConsoleManager.Header("Nový dodavatel");
-        var id = suplierRepository.NextId();
 
-        string? name = ConsoleManager.ReadLine("Název");
-        if (string.IsNullOrEmpty(name))
-            return;
+        Supplier? supplier = AddOrEditSupplier();
+        if (supplier == null) return;
 
-        string? description = ConsoleManager.ReadLine("Popis");
-        if (string.IsNullOrEmpty(description))
-            return;
+        supplier.Id = suplierRepository.NextId();
 
-        int? ico = ConsoleManager.ReadInt("IČO");
-        if (ico == null)
-            return;
-
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO", 1);
-        if (vatPayer == null)
-            return;
-
-        int? dic = null;
-        if (vatPayer == 1)
+        if (suplierRepository.Create(supplier) != null)
         {
-            dic = ConsoleManager.ReadInt("DIČ");
-            if (dic == null)
-                return;
-        }
-
-        string? street = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(street))
-            return;
-
-        int? psc = ConsoleManager.ReadInt("PSč");
-        if (psc == null)
-            return;
-
-        string? city = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(city))
-            return;
-
-        string? number = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(number))
-            return;
-
-        string? email = ConsoleManager.ReadLine("Kontaktní email");
-        if (string.IsNullOrEmpty(email))
-            return;
-
-        int? hasBankAccount = ConsoleManager.ReadInt("Chcete přidat i bankovní účet?");
-        if (hasBankAccount == null) return;
-
-        BankAccount? bankAccount = null;
-        if (hasBankAccount == 1)
-        {
-            long? accountNumber = ConsoleManager.ReadLong("Číslo účtu");
-            if (accountNumber == null)
-                return;
-
-            int? bankNumber = ConsoleManager.ReadInt("Číslo banky");
-            if (bankNumber == null)
-                return;
-
-            int? hasPrefix = ConsoleManager.ReadInt("Přejete si zadat i předčíslí účtu? (0 pro NE, 1 pro ANO", 0);
-            if (hasPrefix == null)
-                return;
-
-            int? prefix = null;
-            if (hasPrefix == 1)
-            {
-                prefix = ConsoleManager.ReadInt("DIČ");
-                if (prefix == null)
-                    return;
-            }
-
-            bankAccount = new BankAccount()
-            {
-                Prefix = prefix,
-                AccountNumber = accountNumber.Value,
-                BankNumber = bankNumber.Value,
-            };
-        }
-
-
-        int? hasHourRate = ConsoleManager.ReadInt("Přejete si zadat výchozí hodinovou sazbu? (0 pro NE, 1 pro ANO", 1);
-        if (hasHourRate == null)
-            return;
-
-        int? hourRate = null;
-        if (hasHourRate == 1)
-        {
-            hourRate = ConsoleManager.ReadInt("DIČ");
-            if (hourRate == null)
-                return;
-        }
-
-        Address address = new Address()
-        {
-            City = city,
-            Street = street,
-            Number = number,
-            PSC = psc.Value,
-        };
-
-        Supplier suplier = new Supplier()
-        {
-            Id = suplierRepository.NextId(),
-            Name = name,
-            Description = description,
-            Address = address,
-            HourRate = hourRate,
-            BankAccount = bankAccount,
-            DIC = dic,
-            Email = email,
-            ICO = ico.Value,
-            VatPayer = vatPayer == 1,
-        };
-
-        if (suplierRepository.Create(suplier) != null)
-        {
-            ConsoleManager.Success($"Dodavatel '{name}' uložen (ID {id}).");
+            ConsoleManager.Success($"Dodavatel '{supplier.Name}' uložen (ID {supplier.Id}).");
         }
         else
         {
@@ -329,123 +221,12 @@ public class App
         if (id == null)
             return;
 
-        Supplier? supplier = suplierRepository.Get(id.Value);
-        if (supplier == null) return;
+        Supplier? supplierToUpdate = suplierRepository.Items.SingleOrDefault(x => x.Id == id);
+        if (supplierToUpdate == null) return;
+        Supplier? newSupplier = AddOrEditSupplier(supplierToUpdate);
+        if (newSupplier == null) return;
 
-        string? name = ConsoleManager.ReadLine("Název", supplier.Name);
-        if (string.IsNullOrEmpty(name))
-            return;
-
-        string? description = ConsoleManager.ReadLine("Popis", supplier.Description);
-        if (string.IsNullOrEmpty(description))
-            return;
-
-        int? ico = ConsoleManager.ReadInt("IČO", supplier.ICO);
-        if (ico == null)
-            return;
-
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO", supplier.VatPayer ? 1 : 0);
-        if (vatPayer == null)
-            return;
-
-        int? dic = null;
-        if (vatPayer == 1)
-        {
-            dic = ConsoleManager.ReadInt("DIČ", supplier.DIC);
-            if (dic == null)
-                return;
-        }
-
-        string? street = ConsoleManager.ReadLine("Ulice", supplier.Address.Street);
-        if (string.IsNullOrEmpty(street))
-            return;
-
-        int? psc = ConsoleManager.ReadInt("PSč", supplier.Address.PSC);
-        if (psc == null)
-            return;
-
-        string? city = ConsoleManager.ReadLine("Ulice", supplier.Address.City);
-        if (string.IsNullOrEmpty(city))
-            return;
-
-        string? number = ConsoleManager.ReadLine("Číslo popisné", supplier.Address.Number);
-        if (string.IsNullOrEmpty(number))
-            return;
-
-        string? email = ConsoleManager.ReadLine("Kontaktní email", supplier.Email);
-        if (string.IsNullOrEmpty(email))
-            return;
-
-        int? hasBankAccount = ConsoleManager.ReadInt("Chcete přidat i bankovní účet?");
-        if (hasBankAccount == null) return;
-
-        BankAccount? bankAccount = null;
-        if (hasBankAccount == 1)
-        {
-            long? accountNumber = ConsoleManager.ReadLong("Číslo účtu", supplier.BankAccount?.AccountNumber);
-            if (accountNumber == null)
-                return;
-
-            int? bankNumber = ConsoleManager.ReadInt("Číslo banky", supplier.BankAccount?.BankNumber);
-            if (bankNumber == null)
-                return;
-
-            int? hasPrefix = ConsoleManager.ReadInt("Přejete si zadat i předčíslí účtu? (0 pro NE, 1 pro ANO", 0);
-            if (hasPrefix == null)
-                return;
-
-            int? prefix = null;
-            if (hasPrefix == 1)
-            {
-                prefix = ConsoleManager.ReadInt("DIČ", supplier.BankAccount?.Prefix);
-                if (prefix == null)
-                    return;
-            }
-
-            bankAccount = new BankAccount()
-            {
-                Prefix = prefix,
-                AccountNumber = accountNumber.Value,
-                BankNumber = bankNumber.Value,
-            };
-        }
-
-
-        int? hasHourRate = ConsoleManager.ReadInt("Přejete si zadat výchozí hodinovou sazbu? (0 pro NE, 1 pro ANO", 1);
-        if (hasHourRate == null)
-            return;
-
-        decimal? hourRate = null;
-        if (hasHourRate == 1)
-        {
-            hourRate = ConsoleManager.ReadDecimal("DIČ", supplier.HourRate);
-            if (hourRate == null)
-                return;
-        }
-
-        Address address = new Address()
-        {
-            City = city,
-            Street = street,
-            Number = number,
-            PSC = psc.Value,
-        };
-
-        Supplier suplier = new Supplier()
-        {
-            Id = suplierRepository.NextId(),
-            Name = name,
-            Description = description,
-            Address = address,
-            HourRate = hourRate,
-            BankAccount = bankAccount,
-            DIC = dic,
-            Email = email,
-            ICO = ico.Value,
-            VatPayer = vatPayer == 1,
-        };
-
-        if (suplierRepository.Update(id.Value, suplier) != null)
+        if (suplierRepository.Update(id.Value, newSupplier) != null)
         {
             ConsoleManager.Success("Dodavatel upraven.");
         }
@@ -501,73 +282,15 @@ public class App
         ConsoleManager.Header("Nový odběratel");
         var id = clientRepository.NextId();
 
-        string? name = ConsoleManager.ReadLine("Název");
-        if (string.IsNullOrEmpty(name))
+        Client? client = AddOrEditClient();
+        if (client == null)
             return;
 
-        string? description = ConsoleManager.ReadLine("Popis");
-        if (string.IsNullOrEmpty(description))
-            return;
+        client.Id = id;
 
-        int? ico = ConsoleManager.ReadInt("IČO");
-        if (ico == null)
-            return;
-
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO", 1);
-        if (vatPayer == null)
-            return;
-
-        int? dic = null;
-        if (vatPayer == 1)
+        if (clientRepository.Create(client) != null)
         {
-            dic = ConsoleManager.ReadInt("DIČ");
-            if (dic == null)
-                return;
-        }
-
-        string? street = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(street))
-            return;
-
-        int? psc = ConsoleManager.ReadInt("PSč");
-        if (psc == null)
-            return;
-
-        string? city = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(city))
-            return;
-
-        string? number = ConsoleManager.ReadLine("Ulice");
-        if (string.IsNullOrEmpty(number))
-            return;
-
-        string? email = ConsoleManager.ReadLine("Kontaktní email");
-        if (string.IsNullOrEmpty(email))
-            return;
-
-        Address address = new Address()
-        {
-            City = city,
-            Street = street,
-            Number = number,
-            PSC = psc.Value,
-        };
-
-        Client suplier = new Client()
-        {
-            Id = suplierRepository.NextId(),
-            Name = name,
-            Description = description,
-            Address = address,
-            DIC = dic,
-            Email = email,
-            ICO = ico.Value,
-            VatPayer = vatPayer == 1,
-        };
-
-        if (clientRepository.Create(suplier) != null)
-        {
-            ConsoleManager.Success($"Odběratel '{name}' uložen (ID {id}).");
+            ConsoleManager.Success($"Odběratel '{client.Name}' uložen (ID {id}).");
         }
         else
         {
@@ -592,77 +315,14 @@ public class App
         ListClients();
         if (clientRepository.Items.Count == 0) return;
         var id = ConsoleManager.ReadInt("ID dodavatele k úpravě");
-        if (id == null)
-            return;
+        if (id == null) return;
 
         Client? supplier = clientRepository.Get(id.Value);
         if (supplier == null) return;
+        Client? newClient = AddOrEditClient(supplier);
+        if (newClient == null) return;
 
-        string? name = ConsoleManager.ReadLine("Název", supplier.Name);
-        if (string.IsNullOrEmpty(name))
-            return;
-
-        string? description = ConsoleManager.ReadLine("Popis", supplier.Description);
-        if (string.IsNullOrEmpty(description))
-            return;
-
-        int? ico = ConsoleManager.ReadInt("IČO", supplier.ICO);
-        if (ico == null)
-            return;
-
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO", supplier.VatPayer ? 1 : 0);
-        if (vatPayer == null)
-            return;
-
-        int? dic = null;
-        if (vatPayer == 1)
-        {
-            dic = ConsoleManager.ReadInt("DIČ", supplier.DIC);
-            if (dic == null)
-                return;
-        }
-
-        string? street = ConsoleManager.ReadLine("Ulice", supplier.Address.Street);
-        if (string.IsNullOrEmpty(street))
-            return;
-
-        int? psc = ConsoleManager.ReadInt("PSč", supplier.Address.PSC);
-        if (psc == null)
-            return;
-
-        string? city = ConsoleManager.ReadLine("Ulice", supplier.Address.City);
-        if (string.IsNullOrEmpty(city))
-            return;
-
-        string? number = ConsoleManager.ReadLine("Číslo popisné", supplier.Address.Number);
-        if (string.IsNullOrEmpty(number))
-            return;
-
-        string? email = ConsoleManager.ReadLine("Kontaktní email", supplier.Email);
-        if (string.IsNullOrEmpty(email))
-            return;
-
-        Address address = new Address()
-        {
-            City = city,
-            Street = street,
-            Number = number,
-            PSC = psc.Value,
-        };
-
-        Supplier suplier = new Supplier()
-        {
-            Id = suplierRepository.NextId(),
-            Name = name,
-            Description = description,
-            Address = address,
-            DIC = dic,
-            Email = email,
-            ICO = ico.Value,
-            VatPayer = vatPayer == 1,
-        };
-
-        if (suplierRepository.Update(id.Value, suplier) != null)
+        if (clientRepository.Update(id.Value, newClient) != null)
         {
             ConsoleManager.Success("Odběratel upraven.");
         }
@@ -707,4 +367,157 @@ public class App
             }
         }
     }
+
+    private LegalPerson? AddOrEditPerson(LegalPerson? person = null)
+    {
+        string? name = ConsoleManager.ReadLine("Zadejte název (/q pro ukončení):", person?.Name);
+        if (string.IsNullOrEmpty(name))
+            return null;
+
+        string? description = ConsoleManager.ReadLine("Zadejte popis (/q pro ukončení):", person?.Description);
+        if (string.IsNullOrEmpty(description))
+            return null;
+
+        int? ico = ConsoleManager.ReadInt("Zadejte IČO (/q pro ukončení):", person?.ICO);
+        if (ico == null)
+            return null;
+
+        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení):", person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
+        if (vatPayer == null)
+            return null;
+
+        int? dic = null;
+        if (vatPayer == 1)
+        {
+            dic = ConsoleManager.ReadInt("Zadejte DIČ (/q pro ukončení):", person?.DIC);
+            if (dic == null)
+                return null;
+        }
+
+        string? street = ConsoleManager.ReadLine("Zadejte ulici (/q pro ukončení):", person?.Address.Street);
+        if (string.IsNullOrEmpty(street))
+            return null;
+
+        int? psc = ConsoleManager.ReadInt("Zadejte PSČ (/q pro ukončení):", person?.Address.PSC);
+        if (psc == null)
+            return null;
+
+        string? city = ConsoleManager.ReadLine("Zadejte město (/q pro ukončení):", person?.Address.City);
+        if (string.IsNullOrEmpty(city))
+            return null;
+
+        string? number = ConsoleManager.ReadLine("Zadejte číslo popisné (/q pro ukončení):", person?.Address.Number);
+        if (string.IsNullOrEmpty(number))
+            return null;
+
+        string? email = ConsoleManager.ReadLine("Zadejte kontaktní email (/q pro ukončení):", person?.Email);
+        if (string.IsNullOrEmpty(email))
+            return null;
+
+        Address address = new Address()
+        {
+            City = city,
+            Street = street,
+            Number = number,
+            PSC = psc.Value,
+        };
+
+        LegalPerson newPerson = new LegalPerson()
+        {
+            Id = suplierRepository.NextId(),
+            Name = name,
+            Description = description,
+            Address = address,
+            DIC = dic,
+            Email = email,
+            ICO = ico.Value,
+            VatPayer = vatPayer == 1,
+        };
+
+        return newPerson;
+
+    }
+
+    private Supplier? AddOrEditSupplier(Supplier? supplier = null)
+    {
+        LegalPerson? person = AddOrEditPerson(supplier);
+
+        if (person == null)
+            return null;
+
+
+        int? hasBankAccount = ConsoleManager.ReadInt("Chcete přidat i bankovní účet?");
+        if (hasBankAccount == null)
+            return null;
+
+        BankAccount? bankAccount = null;
+        if (hasBankAccount == 1)
+        {
+            long? accountNumber = ConsoleManager.ReadLong("Zadejte číslo účtu (/q pro ukončení):", supplier?.BankAccount?.AccountNumber);
+            if (accountNumber == null)
+                return null;
+
+            int? bankNumber = ConsoleManager.ReadInt("Zadejte číslo banky (/q pro ukončení):", supplier?.BankAccount?.BankNumber);
+            if (bankNumber == null)
+                return null;
+
+            int? hasPrefix = ConsoleManager.ReadInt("Přejete si zadat i předčíslí účtu? (0 pro NE, 1 pro ANO", 0);
+            if (hasPrefix == null)
+                return null;
+
+            int? prefix = null;
+            if (hasPrefix == 1)
+            {
+                prefix = ConsoleManager.ReadInt($"Zadejte předčíslí k účtu {accountNumber} (/q pro ukončení):", supplier?.BankAccount?.Prefix);
+                if (prefix == null)
+                    return null;
+            }
+
+            bankAccount = new BankAccount()
+            {
+                Prefix = prefix,
+                AccountNumber = accountNumber.Value,
+                BankNumber = bankNumber.Value,
+            };
+        }
+
+
+        int? hasHourRate = ConsoleManager.ReadInt("Přejete si zadat výchozí hodinovou sazbu? (0 pro NE, 1 pro ANO", 1);
+        if (hasHourRate == null)
+            return null;
+
+        int? hourRate = null;
+        if (hasHourRate == 1)
+        {
+            hourRate = ConsoleManager.ReadInt("Zadejte hodinovou sazbu (/q pro ukončení):");
+            if (hourRate == null)
+                return null;
+        }
+
+        return new Supplier()
+        {
+            Address = person.Address,
+            Description = person.Description,
+            DIC = person.DIC,
+            Email = person.Email,
+            ICO = person.ICO,
+            Name = person.Name,
+            VatPayer = person.VatPayer,
+            BankAccount = bankAccount,
+            HourRate = hourRate,
+        };
+    }
+
+    private Client? AddOrEditClient(Client? client = null)
+    {
+        LegalPerson? person = AddOrEditPerson(client);
+
+        if (person == null)
+            return null;
+
+        return person as Client;
+    }
+
+
+
 }
