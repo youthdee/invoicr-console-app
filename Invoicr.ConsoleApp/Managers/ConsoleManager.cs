@@ -101,6 +101,24 @@ public static class ConsoleManager
         }
     }
 
+    public static long? ReadLong(string prompt, decimal? defaultVal = null)
+    {
+        var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
+        while (true)
+        {
+            var raw = ReadLine(prompt, defStr);
+
+            if (raw == "/q")
+                return null;
+
+            if (long.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+                return d;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  Zadej číslo.");
+            Console.ResetColor();
+        }
+    }
+
     public static void Success(string msg)
     {
         Console.ForegroundColor = ConsoleColor.Green;

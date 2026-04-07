@@ -15,7 +15,7 @@ public class LegalPerson : IObjectWithId<int>
     public string? Description { get; set; }
 
     //Sekundární identifikátor právní osoby
-    public string ICO { get; set; }
+    public int ICO { get; set; }
 
     //Plátce DPH kvůli DIC, které je nullable
     public bool VatPayer { get; set; }
