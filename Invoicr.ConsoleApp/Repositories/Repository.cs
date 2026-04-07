@@ -113,9 +113,6 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
 
         return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
     }
-
-    public List<Item> List() => Items;
-
     //CRUD metody
 
     //Metoda pro vytvoření Itemu, vrátí null při chybě
@@ -130,7 +127,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         catch (Exception e)
         {
             Console.WriteLine(
-                $"Nastala neočekávaná chyba při vytváření objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.");
+                $"Nastala neočekávaná chyba při vytváření objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.\n {e.ToString()}");
             //throw; 
         }
 
@@ -156,7 +153,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         catch (Exception e)
         {
             Console.WriteLine(
-                $"Nastala neočekávaná chyba při aktualizaci objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.");
+                $"Nastala neočekávaná chyba při aktualizaci objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.\n {e.ToString()}");
             //throw; 
         }
 
@@ -187,7 +184,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         catch (Exception e)
         {
             Console.WriteLine(
-                $"Nastala neočekávaná chyba při vytváření objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.");
+                $"Nastala neočekávaná chyba při vytváření objektu třídy {nameof(Item)}. Zkuste prosím operaci znovu.\n {e.ToString()}");
             //throw; 
         }
 
@@ -197,5 +194,5 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     //Metoda pro získání Item podle id, vrátí null při nenalezení
     public Item? Get(ID id) => Items.SingleOrDefault(x => x.Id.Equals(id));
 
-    public ID NextId() => Items[Items.Count - 1].Id;
+    public ID NextId() => Items.Count > 0 ? Items[Items.Count - 1].Id : default!;
 }
