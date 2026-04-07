@@ -36,20 +36,26 @@ public static class ConsoleManager
         }
     }
 
-    public static string ReadLine(string prompt, string? defaultVal = null)
+    public static string? ReadLine(string prompt, string? defaultVal = null)
     {
         var hint = defaultVal is not null ? $" [{defaultVal}]" : "";
         Console.Write($"  {prompt}{hint}: ");
         var val = Console.ReadLine()?.Trim();
+        if (val == "/q")
+            return null;
         return string.IsNullOrEmpty(val) ? (defaultVal ?? "") : val;
     }
 
-    public static DateTime ReadDate(string prompt, DateTime? defaultVal = null)
+    public static DateTime? ReadDate(string prompt, DateTime? defaultVal = null)
     {
         var defStr = defaultVal?.ToString("yyyy-MM-dd");
         while (true)
         {
             var raw = ReadLine(prompt + " (yyyy-MM-dd)", defStr);
+
+            if (raw == "/q")
+                return null;
+
             if (DateTime.TryParseExact(raw, "yyyy-MM-dd", CultureInfo.InvariantCulture,
                     DateTimeStyles.None, out var dt))
                 return dt;
@@ -59,12 +65,34 @@ public static class ConsoleManager
         }
     }
 
-    public static decimal ReadDecimal(string prompt, decimal? defaultVal = null)
+    public static int? ReadInt(string prompt, int? defaultVal = null)
     {
         var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
         while (true)
         {
             var raw = ReadLine(prompt, defStr);
+
+            if (raw == "/q")
+                return null;
+
+            if (int.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+                return d;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  Zadej číslo.");
+            Console.ResetColor();
+        }
+    }
+
+    public static decimal? ReadDecimal(string prompt, decimal? defaultVal = null)
+    {
+        var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
+        while (true)
+        {
+            var raw = ReadLine(prompt, defStr);
+
+            if (raw == "/q")
+                return null;
+
             if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
             Console.ForegroundColor = ConsoleColor.Red;

@@ -20,6 +20,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     {
         Directory.CreateDirectory(path);
         this.Path = path;
+        Load();
     }
 
     //CSV operace repozitáře
@@ -195,4 +196,6 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
 
     //Metoda pro získání Item podle id, vrátí null při nenalezení
     public Item? Get(ID id) => Items.SingleOrDefault(x => x.Id.Equals(id));
+
+    public ID NextId() => Items[Items.Count - 1].Id;
 }
