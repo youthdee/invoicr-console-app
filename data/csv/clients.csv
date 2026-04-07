@@ -1,2 +1,2 @@
-﻿Description;Email;ICO;Id;Name;VatPayer
-test;test;1;0;test2;False
+﻿City;Description;DIC;Email;ICO;Id;Name;Number;PSC;Street;VatPayer
+1;1;1;1;1;1;1;1;1;1;True

@@ -119,6 +119,8 @@ public class App
             IssueDate = issueDate.Value,
             DueDate = dueDate.Value,
             ClientId = client.Id,
+            Client = client,
+            Supplier = supplier,
             SupplierId = supplier.Id,
             Currency = (Currency)currency.Value,
             Note = note,
@@ -511,10 +513,20 @@ public class App
     {
         LegalPerson? person = AddOrEditPerson(client);
 
+
         if (person == null)
             return null;
 
-        return person as Client;
+        return new Client()
+        {
+            Address = person.Address,
+            Description = person.Description,
+            DIC = person.DIC,
+            Email = person.Email,
+            VatPayer = person.VatPayer,
+            ICO = person.ICO,
+            Name = person.Name
+        };
     }
 
 }

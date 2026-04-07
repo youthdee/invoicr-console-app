@@ -2,7 +2,7 @@ using Invoicr.Objects;
 
 namespace Invoicr.Repositories;
 
-public class ClientRepository : Repository<Client, int>
+public class ClientRepository : Repository<Client>
 {
     private const string file = "clients.csv";
 

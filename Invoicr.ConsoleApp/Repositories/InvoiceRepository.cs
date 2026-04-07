@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Invoicr.Repositories;
 
-public class InvoiceRepository : Repository<Invoice, int>
+public class InvoiceRepository : Repository<Invoice>
 {
     private const string file = "invoices.csv";
 

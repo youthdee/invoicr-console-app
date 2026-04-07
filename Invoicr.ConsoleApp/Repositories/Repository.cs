@@ -10,19 +10,20 @@ public interface IObjectWithId<ID> where ID : notnull
     public ID Id { get; set; }
 }
 
-public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>, new() where ID : notnull
+public abstract class Repository<Item> where Item : class, IObjectWithId<int>, new()
 {
     protected readonly string FullPath;
 
-    public List<Item> Items { get; protected set; } = new();
+    public List<Item> Items { get; set; }
+
 
     public Repository(string path, bool preload = true)
     {
-        //if (!Directory.Exists(path))
-        //{
-        //    //reálně vytvářím CSV, tahle metoda by překousla vytvoření složky pokud už existuje, ale jedná se o CSV a tam to padá na vyjímce.
-        //    Directory.CreateDirectory(path);
-        //}
+        string? directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
 
         this.FullPath = path;
         if (preload)
@@ -86,16 +87,32 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         File.WriteAllLines(FullPath, lines, Encoding.UTF8);
     }
 
+    //pomocí LINQ si vytáhnu jednoduché properties objektu a pro jistotu je seřadím, protože to .NET negarantuje.
     // Pomocná metoda pro získání vlastností, které nejsou vnořené třídy
     protected PropertyInfo[] GetSimpleProperties()
     {
-        //pomocí LINQ si vytáhnu jednoduché properties objektu a pro jistotu je seřadím, protože to .NET negarantuje.
-        return typeof(Item).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .OrderBy(x => x.Name)
-            .Where(p => p.PropertyType.IsPrimitive ||
-                        p.PropertyType == typeof(string) ||
-                        p.PropertyType == typeof(decimal) ||
-                        p.PropertyType == typeof(DateTime))
+        var allProperties = typeof(Item).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        return allProperties
+            .Where(p =>
+            {
+                // Musí mít getter a musí být buď Public nebo Internal (IsAssembly)
+                var getMethod = p.GetMethod;
+                if (getMethod == null) return false;
+
+                bool isPublicOrInternal = getMethod.IsPublic || getMethod.IsAssembly;
+                if (!isPublicOrInternal) return false;
+
+                // Rozbalíme Nullable typy (int? -> int)
+                Type type = Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType;
+
+                // Filtrujeme jen "jednoduché" typy - objekty (Address, BankAccount) to zahodí
+                return type.IsPrimitive ||
+                       type == typeof(string) ||
+                       type == typeof(decimal) ||
+                       type == typeof(DateTime);
+            })
+            .OrderBy(x => x.Name) // DŮLEŽITÉ: CSV musí odpovídat tomuto pořadí!
             .ToArray();
     }
 
@@ -109,15 +126,28 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     }
 
     // Převod z CSV stringu na typ vlastnosti
-    protected object ConvertValue(string value, Type targetType)
+    protected object? ConvertValue(string value, Type targetType)
     {
-        if (targetType == typeof(DateTime))
+        Type? underlyingType = Nullable.GetUnderlyingType(targetType);
+        Type actualType = underlyingType ?? targetType;
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return underlyingType != null ? null : Activator.CreateInstance(actualType);
+        }
+
+        if (actualType == typeof(DateTime))
+        {
+            // Tady bacha na formát, musí odpovídat FormatValue
             return DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
 
-        if (targetType == typeof(decimal))
+        if (actualType == typeof(decimal))
+        {
             return decimal.Parse(value, CultureInfo.InvariantCulture);
+        }
 
-        return Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
+        return Convert.ChangeType(value, actualType, CultureInfo.InvariantCulture);
     }
     //CRUD metody
 
@@ -129,6 +159,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         {
             Items.Add(item);
             Save();
+            result = item;
         }
         catch (Exception e)
         {
@@ -141,7 +172,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     }
 
     //Metoda pro update Itemu, vrátí null při chybě
-    public Item? Update(ID id, Item item)
+    public Item? Update(int id, Item item)
     {
         if (Get(id) == null)
             return null;
@@ -167,7 +198,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     }
 
     //Metoda pro odstranění Itemu, vrátí null při chybě
-    public bool? Delete(ID id)
+    public bool? Delete(int id)
     {
         if (Get(id) == null)
             return false;
@@ -198,7 +229,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     }
 
     //Metoda pro získání Item podle id, vrátí null při nenalezení
-    public Item? Get(ID id) => Items.SingleOrDefault(x => x.Id.Equals(id));
+    public Item? Get(int id) => Items.SingleOrDefault(x => x.Id.Equals(id));
 
-    public ID NextId() => Items.Count > 0 ? Items[Items.Count - 1].Id : default!;
+    public int NextId() => Items.Count > 0 ? Items[Items.Count - 1].Id + 1 : 1;
 }
