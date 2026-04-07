@@ -1,4 +1,3 @@
-using Invoicr.ConsoleApp.Repositories;
 using Invoicr.Repositories;
 
 namespace Invoicr.Objects;

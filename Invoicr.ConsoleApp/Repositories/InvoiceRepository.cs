@@ -1,14 +1,12 @@
-using System.Globalization;
-using System.Text;
 using Invoicr.Objects;
 
 namespace Invoicr.Repositories;
 
 public class InvoiceRepository : Repository<Invoice, int>
 {
-    private const string path = "invoices.csv";
+    private const string file = "invoices.csv";
 
-    public InvoiceRepository() : base(path)
+    public InvoiceRepository(string basePath) : base(Path.Combine(basePath, file))
     {
     }
 }

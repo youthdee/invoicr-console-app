@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Invoicr.ConsoleApp.Repositories;
 using Invoicr.Managers;
 using Invoicr.Objects;
 using Invoicr.Objects.AppSettings;
@@ -9,7 +8,6 @@ namespace Invoicr.ConsoleApp;
 
 public class App
 {
-    private readonly AppSettingsManager appSettingsManager;
     private readonly SupplierRepository suplierRepository;
     private readonly ClientRepository clientRepository;
     private readonly InvoiceRepository invoiceRepository;
@@ -28,13 +26,13 @@ public class App
         }
         else
         {
-            Console.WriteLine("Chyba: Soubor config.json nebyl nalezen!");
+            throw new InvalidOperationException("Chyba: Soubor config.json nebyl nalezen!");
         }
 
         //inicializace repozitářů
-        suplierRepository = new SupplierRepository();
-        clientRepository = new ClientRepository();
-        invoiceRepository = new InvoiceRepository();
+        suplierRepository = new SupplierRepository(appSettings.CsvFolder);
+        clientRepository = new ClientRepository(appSettings.CsvFolder);
+        invoiceRepository = new InvoiceRepository(appSettings.CsvFolder);
     }
 
     public void Run()
@@ -92,7 +90,7 @@ public class App
         int ci = ConsoleManager.ReadChoice(1, clientRepository.Items.Count) - 1;
         Client client = clientRepository.Items[ci];
 
-        string number = appSettingsManager.NextInvoiceNumber();
+        string number = $"{appSettings.InvoicePrefix}{(appSettings.InvoiceStartNumber + appSettings.InvoiceStep * invoiceRepository.Items.Count()):D4}";
         ConsoleManager.Info($"Číslo faktury: {number}");
 
         DateTime? issueDate = ConsoleManager.ReadDate("Datum vystavení", DateTime.Today);
@@ -130,10 +128,8 @@ public class App
 
         if (invoiceRepository.Create(invoice) != null)
         {
-            appSettingsManager.BumpInvoiceNumber();
-
             ConsoleManager.Success($"Faktura {number} uložena. Celkem: {hours * rate:N2} {currency}");
-            ConsoleManager.Info($"PDF výstup naleznete v: {appSettingsManager.Settings.PdfOutputFolder}");
+            ConsoleManager.Info($"PDF výstup naleznete v: {appSettings.PdfOutputFolder}");
         }
         else
         {
@@ -695,8 +691,20 @@ public class App
 
     void ShowOrGenerateInvoices()
     {
-        // while (true)
-        // {
-        // }
+        while (true)
+        {
+            ConsoleManager.Header("Faktury");
+            ConsoleManager.MenuItem(1, "Seznam faktur");
+            ConsoleManager.MenuItem(2, "Znovu vygenerovat fakturu");
+            ConsoleManager.MenuItem(0, "Zpět");
+
+            int choice = ConsoleManager.ReadChoice(0, 2);
+            switch (choice)
+            {
+                case 1: ListInvoices(); break;
+                case 2: ListInvoices(); break; //TODO!
+                case 0: return;
+            }
+        }
     }
 }

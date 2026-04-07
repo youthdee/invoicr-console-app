@@ -4,3 +4,4 @@ obj/
 .idea/
 .global.json
 .vs/
+appsettings.json

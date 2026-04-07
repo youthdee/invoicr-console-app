@@ -18,7 +18,12 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
 
     public Repository(string path)
     {
-        Directory.CreateDirectory(path);
+        //if (!Directory.Exists(path))
+        //{
+        //    //reálně vytvářím CSV, tahle metoda by překousla vytvoření složky pokud už existuje, ale jedná se o CSV a tam to padá na vyjímce.
+        //    Directory.CreateDirectory(path);
+        //}
+
         this.Path = path;
         Load();
     }
