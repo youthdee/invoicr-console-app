@@ -12,11 +12,11 @@ public interface IObjectWithId<ID> where ID : notnull
 
 public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>, new() where ID : notnull
 {
-    private readonly string Path;
+    protected readonly string FullPath;
 
-    public List<Item> Items { get; private set; } = new();
+    public List<Item> Items { get; protected set; } = new();
 
-    public Repository(string path)
+    public Repository(string path, bool preload = true)
     {
         //if (!Directory.Exists(path))
         //{
@@ -24,19 +24,20 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
         //    Directory.CreateDirectory(path);
         //}
 
-        this.Path = path;
-        Load();
+        this.FullPath = path;
+        if (preload)
+            Load();
     }
 
     //CSV operace repozitáře
-    public void Load()
+    public virtual void Load()
     {
-        if (!File.Exists(Path)) return;
+        if (!File.Exists(FullPath)) return;
 
         //získání netřídových properties generického Itemu (do CSV neukládáme vnořené třídy, cheme objekty typu string, int apod...)
         var properties = GetSimpleProperties();
 
-        Items = File.ReadAllLines(Path, Encoding.UTF8)
+        Items = File.ReadAllLines(FullPath, Encoding.UTF8)
             .Skip(1) // První řádek je vždy hlavička, takže přeskočíme
             .Where(l => !string.IsNullOrWhiteSpace(l))
             .Select(l =>
@@ -82,11 +83,11 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
             return CsvManager.Row(values);
         }));
 
-        File.WriteAllLines(Path, lines, Encoding.UTF8);
+        File.WriteAllLines(FullPath, lines, Encoding.UTF8);
     }
 
     // Pomocná metoda pro získání vlastností, které nejsou vnořené třídy
-    private PropertyInfo[] GetSimpleProperties()
+    protected PropertyInfo[] GetSimpleProperties()
     {
         //pomocí LINQ si vytáhnu jednoduché properties objektu a pro jistotu je seřadím, protože to .NET negarantuje.
         return typeof(Item).GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -108,7 +109,7 @@ public abstract class Repository<Item, ID> where Item : class, IObjectWithId<ID>
     }
 
     // Převod z CSV stringu na typ vlastnosti
-    private object ConvertValue(string value, Type targetType)
+    protected object ConvertValue(string value, Type targetType)
     {
         if (targetType == typeof(DateTime))
             return DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture);

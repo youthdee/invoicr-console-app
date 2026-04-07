@@ -6,4 +6,6 @@ public class Address
     public int PSC { get; set; }
     public string City { get; set; }
     public string Number { get; set; }
+
+    public override string ToString() => $"{PSC} {City}, {Street} {Number}";
 }

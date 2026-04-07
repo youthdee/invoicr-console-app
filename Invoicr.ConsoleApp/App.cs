@@ -1,9 +1,8 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Text.Json;
 using Invoicr.Managers;
 using Invoicr.Objects;
 using Invoicr.Objects.AppSettings;
 using Invoicr.Repositories;
+using System.Text.Json;
 
 namespace Invoicr.ConsoleApp;
 
@@ -33,7 +32,7 @@ public class App
         //inicializace repozitářů
         suplierRepository = new SupplierRepository(appSettings.CsvFolder);
         clientRepository = new ClientRepository(appSettings.CsvFolder);
-        invoiceRepository = new InvoiceRepository(appSettings.CsvFolder);
+        invoiceRepository = new InvoiceRepository(appSettings.CsvFolder, suplierRepository, clientRepository);
     }
 
     public void Run()
@@ -145,16 +144,10 @@ public class App
             ConsoleManager.Info("Žádné faktury.");
             return;
         }
-
-        Console.WriteLine($"  {"Číslo",-12} {"Dodavatel",-20} {"Odběratel",-20} {"Datum",-12} {"Celkem",10}");
         ConsoleManager.Separator();
         foreach (var inv in invoiceRepository.Items)
         {
-            var sup = suplierRepository.Get(inv.SupplierId)?.Name ?? inv.SupplierId.ToString();
-            var cli = clientRepository.Get(inv.ClientId)?.Name ?? inv.ClientId.ToString();
-            var total = inv.HoursWorked * inv.HourRate;
-            Console.WriteLine(
-                $"  {inv.Number,-12} {sup,-20} {cli,-20} {inv.IssueDate:yyyy-MM-dd}  {total,8:N2} {inv.Currency}");
+            Console.WriteLine(inv.ToString());
         }
     }
 
@@ -210,7 +203,7 @@ public class App
         }
 
         foreach (var s in suplierRepository.Items)
-            ConsoleManager.Info($"[{s.Id}] {s.Name} | IČO: {s.ICO} | {s.Address} | {s.Email}");
+            Console.WriteLine(s.ToString());
     }
 
     void EditSupplier()
@@ -307,7 +300,7 @@ public class App
         }
 
         foreach (var c in clientRepository.Items)
-            ConsoleManager.Info($"[{c.Id}] {c.Name} | IČO: {c.ICO} | {c.Address} | {c.Email}");
+            Console.WriteLine(c.ToString());
     }
 
     void EditClient()
@@ -487,10 +480,15 @@ public class App
             return null;
 
         int? hourRate = null;
+        int? hourRateCurreny = null;
         if (hasHourRate == 1)
         {
             hourRate = ConsoleManager.ReadInt("Zadejte hodinovou sazbu (/q pro ukončení):");
             if (hourRate == null)
+                return null;
+
+            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení):", (int?)supplier?.HourRateCurrency ?? 0);
+            if (hourRateCurreny == null)
                 return null;
         }
 
@@ -505,6 +503,7 @@ public class App
             VatPayer = person.VatPayer,
             BankAccount = bankAccount,
             HourRate = hourRate,
+            HourRateCurrency = (Currency?)hourRateCurreny,
         };
     }
 
@@ -517,7 +516,5 @@ public class App
 
         return person as Client;
     }
-
-
 
 }
