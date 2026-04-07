@@ -135,4 +135,22 @@ public static class ConsoleManager
 
     public static void Info(string msg)
         => Console.WriteLine($"  {msg}");
+
+    private static void PrintHeader(string title, string columns, int width)
+    {
+        Console.WriteLine($"\n>>> {title.ToUpper()} <<<");
+        Console.WriteLine(new string('-', width));
+        Console.WriteLine(columns);
+        Console.WriteLine(new string('-', width));
+    }
+
+    public static void PrintTable<T>(string title, List<T> items, string header, int width)
+    {
+        PrintHeader(title, header, width);
+        foreach (var item in items)
+        {
+            Console.WriteLine(item?.ToString());
+        }
+        Console.WriteLine(new string('-', width));
+    }
 }

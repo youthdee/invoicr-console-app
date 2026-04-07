@@ -147,10 +147,9 @@ public class App
             return;
         }
         ConsoleManager.Separator();
-        foreach (var inv in invoiceRepository.Items)
-        {
-            Console.WriteLine(inv.ToString());
-        }
+        ConsoleManager.PrintTable("Faktury", invoiceRepository.Items,
+            $"| {"ID",-4} | {"ČÍSLO",-12} | {"VYSTAVENO",-10} | {"SPLATNOST",-10} | {"CELKEM",-14} | {"DODAVATEL",-20} | {"ODBĚRATEL",-20} |",
+            115);
     }
 
     void MenuSuppliers()
@@ -203,9 +202,10 @@ public class App
             ConsoleManager.Info("Žádní dodavatelé.");
             return;
         }
-
-        foreach (var s in suplierRepository.Items)
-            Console.WriteLine(s.ToString());
+        ConsoleManager.Separator();
+        ConsoleManager.PrintTable("Dodavatelé", suplierRepository.Items,
+            $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} | {"SAZBA",-12} | {"BANKOVNÍ ÚČET",-25} |",
+            172);
     }
 
     void EditSupplier()
@@ -300,9 +300,10 @@ public class App
             ConsoleManager.Info("Žádní odběratelé.");
             return;
         }
-
-        foreach (var c in clientRepository.Items)
-            Console.WriteLine(c.ToString());
+        ConsoleManager.Separator();
+        ConsoleManager.PrintTable("Odběratelé", clientRepository.Items,
+            $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} |",
+            128);
     }
 
     void EditClient()

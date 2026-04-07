@@ -57,5 +57,8 @@ public class LegalPerson : IObjectWithId<int>
     {
         return true;
     }
-    public override string ToString() => $"|Id: {Id} |Název: {Name} |Ičo: {ICO} |Plátce DPH: {(VatPayer ? "Ano" : "Ne")} |Adresa: {Address.ToString()} |Email: {Email} |";
+    public override string ToString()
+    {
+        return $"| {Id,-4} | {Name,-25} | {ICO,-10} | {(VatPayer ? "Ano" : "Ne"),-3} | {Address.ToString(),-45} | {Email,-25} |";
+    }
 }

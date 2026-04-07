@@ -48,6 +48,7 @@ public class Invoice : IObjectWithId<int>
 
     public override string ToString()
     {
-        return $"|Id: {Id} |Číslo: {Number} |Vystaveno: {IssueDate.ToString("dd.MM.yyyy")} |Splatnost: {DueDate.ToString("dd.MM.yyyy")}|Celková částka: {HoursWorked * HourRate} {Currency}|Dodavatel: {Supplier.Name}, {Supplier.ICO} (id: {Supplier.Id}) |Odběratel: {Client.Name}, {Client.ICO} (id: {Client.Id}) |";
+        decimal total = HoursWorked * HourRate;
+        return $"| {Id,-4} | {Number,-12} | {IssueDate:dd.MM.yyyy} | {DueDate:dd.MM.yyyy} | {total,10:N2} {Currency,-3} | {Supplier.Name,-20} | {Client.Name,-20} |";
     }
 }

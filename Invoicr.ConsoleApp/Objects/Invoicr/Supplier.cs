@@ -43,6 +43,7 @@ public class Supplier : LegalPerson
 
     public override string ToString()
     {
-        return base.ToString() + $"Sazba: {HourRate} {HourRateCurrency.ToString()} |Bankovní účet: {BankAccount?.ToString()} |";
+        string baseData = base.ToString().TrimEnd('|');
+        return $"{baseData} | {HourRate,8:N2} {HourRateCurrency,-3} | {BankAccount?.ToString() ?? "N/A",-25} |";
     }
 }
