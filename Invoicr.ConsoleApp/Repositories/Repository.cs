@@ -5,18 +5,42 @@ using Invoicr.Managers;
 
 namespace Invoicr.Repositories;
 
+/// <summary>
+/// Jednoduchý interface jasně garantující property Id typu ID.
+/// </summary>
+/// <typeparam name="ID"></typeparam>
+
+// Bez toho interfacu bych nemohl udělat takto generickou base repozitřovou třídu.
+// Jediné řešení by potom bylo přes reflexi.  
+// Jelikož umím pracovat s touhle architekturou (Entity Framework, dotnet apod.) tak jsem zvolil tohle řešení.
 public interface IObjectWithId<ID> where ID : notnull
 {
     public ID Id { get; set; }
 }
 
+/// <summary>
+/// Base repozitářová třída. Umí klasické CRUD operace.
+/// Item musí implementovat interface IObjectWithId, který má property Id typu ID.
+/// V našem případě je generika ID čistý int.
+/// </summary>
+/// <typeparam name="Item"></typeparam>
 public abstract class Repository<Item> where Item : class, IObjectWithId<int>, new()
 {
+    // Cesta k CSV souboru. V našem případě převzatá z rodiče který tuto třídu dědí. 
+    // Dalo by se říct, že to je takový connection string k DB.
     protected readonly string FullPath;
 
-    public List<Item> Items { get; set; } //schválně neinicializuji, abych měl jistotu že jsou data načtená
+    //schválně neinicializuji, abych měl jistotu že jsou data načtená
+    //Dalo by se říct, že to je takový IQueryable, neboli množina entit z databáze (definice select dotazu)
+    //To nám hraje do karet, protože IQueryable a List mají LINQ. (queryable má ještě nadstavbu)
+    public List<Item> Items { get; set; }
 
-
+    /// <summary>
+    /// Jednoduchý konstruktor. Nepovinný argument preload, který přednačte data do Items.
+    /// Nepovinný je kvůli možnosti override metody Load. Jinak by se metoda Load předka volala předtím, než by se inicializoval předkův konstruktor.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="preload"></param>
     public Repository(string path, bool preload = true)
     {
         //když soubory a nebo cesta neexistuje, tak ji vytvořím (pokud to systém dovolí)
@@ -27,19 +51,26 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
             File.Create(path).Close();
         }
 
+        //předání z konstruktoru do readonly proměnné
         this.FullPath = path;
+        //pokud preload, tak načíst data už teď.
         if (preload)
             Load();
     }
 
     //CSV operace repozitáře
+    /// <summary>
+    /// Načte data z CSV do paměti (Items). Nepodporuje filtrování ani řazení.
+    /// </summary>
     public virtual void Load()
     {
+        //Pokud neexistuje CSV soubor, nemáme co načítat...
         if (!File.Exists(FullPath)) return;
 
         //získání netřídových properties generického Itemu (do CSV neukládáme vnořené třídy, cheme objekty typu string, int apod...)
         var properties = GetSimpleProperties();
 
+        //Použijeme reflexi pro dynamické dosazení values do properties třídy Item. Abych to nemusel psát pro kažou třídu...
         Items = File.ReadAllLines(FullPath, Encoding.UTF8)
             .Skip(1) // První řádek je vždy hlavička, takže přeskočíme
             .Where(l => !string.IsNullOrWhiteSpace(l))
@@ -55,7 +86,8 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
                     var prop = properties[i];
                     var value = values[i];
                     //musíme zpět konvertovat
-                    object convertedValue = ConvertValue(value, prop.PropertyType);
+                    object? convertedValue = ConvertValue(value, prop.PropertyType);
+                    // a nakonec nastavíme value do property
                     prop.SetValue(item, convertedValue);
                 }
 
@@ -64,17 +96,22 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
             .ToList();
     }
 
+    /// <summary>
+    /// Metoda, která veme data (Items) a znovu je uloží do CSV. Tzn. přepíše.
+    /// </summary>
     public void Save()
     {
         //získání netřídových properties generického Itemu (do CSV neukládáme vnořené třídy, cheme objekty typu string, int apod...)
         var properties = GetSimpleProperties();
 
+        // řádky Itemů
         var lines = new List<string>();
 
         // 1. Hlavička - názvy vlastností
         lines.Add(CsvManager.Row(properties.Select(p => p.Name).ToArray()));
 
         // 2. Data
+        //Jednoduchým selectem pro každý item konvertujeme jeho simple properties na "text", který je připravený být uložen do CSV.
         lines.AddRange(Items.Select(item =>
         {
             var values = properties.Select(p =>
@@ -89,8 +126,10 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
         File.WriteAllLines(FullPath, lines, Encoding.UTF8);
     }
 
-    //pomocí LINQ si vytáhnu jednoduché properties objektu a pro jistotu je seřadím, protože to .NET negarantuje.
-    // Pomocná metoda pro získání vlastností, které nejsou vnořené třídy
+    /// <summary>
+    /// Pomocná metoda pro získání vlastností, které nejsou vnořené třídy
+    /// </summary>
+    /// <returns></returns>
     protected PropertyInfo[] GetSimpleProperties()
     {
         var allProperties =
@@ -119,42 +158,66 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
             .ToArray();
     }
 
-    // Formátování pro zápis do CSV
+    /// <summary>
+    /// Formátování pro zápis do CSV
+    /// </summary>
+    /// <param name="val"></param>
+    /// <returns></returns>
     private string FormatValue(object? val)
     {
         if (val == null) return "";
-        if (val is DateTime dt) return dt.ToString("yyyy-MM-dd");
+        if (val is DateTime dt) return dt.ToString("dd.MM.yyyy");
         if (val is IFormattable formattable) return formattable.ToString(null, CultureInfo.InvariantCulture);
         return val.ToString() ?? "";
     }
 
-    // Převod z CSV stringu na typ vlastnosti
+    /// <summary>
+    /// Převod z CSV stringu na typ vlastnosti
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="targetType"></param>
+    /// <returns></returns>
+    ///
+    // funkce byla polovygenerována AI, resp. inspirována, protože jsem nevěděl, jak to udělat pro ty "jednoduché" properties.
     protected object? ConvertValue(string value, Type targetType)
     {
+        // Pokusí se vytáhnout vnitřní typ z Nullable (např. z int? dostane int), jinak vrátí null.
         Type? underlyingType = Nullable.GetUnderlyingType(targetType);
+
+        // Pokud byl typ Nullable, použije jeho vnitřní typ, jinak pracuje s původním typem.
         Type actualType = underlyingType ?? targetType;
 
+        // Zkontroluje, jestli ze souboru nepřišel prázdný řetězec nebo jen mezery.
         if (string.IsNullOrWhiteSpace(value))
         {
+            // Vrací null pro Nullable typy, ale pro běžné typy (jako int) vytvoří defaultní hodnotu (např. 0).
             return underlyingType != null ? null : Activator.CreateInstance(actualType);
         }
 
+        // Ověří, jestli je cílový typ (i ten "rozbalený") typu DateTime.
         if (actualType == typeof(DateTime))
         {
-            // Tady bacha na formát, musí odpovídat FormatValue
-            return DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            // Převede text na datum přesně podle českého formátu bez ohledu na nastavení počítače.
+            return DateTime.ParseExact(value, "dd.MM.yyyy", CultureInfo.InvariantCulture);
         }
 
+        // Zjistí, jestli je potřeba text převést na desetinné číslo (decimal).
         if (actualType == typeof(decimal))
         {
+            // Rozparsuje číslo pomocí neutrální kultury, aby se nehádaly tečky s čárkami.
             return decimal.Parse(value, CultureInfo.InvariantCulture);
         }
 
+        // Pro všechny ostatní základní typy (int, bool, long atd.) zkusí univerzální převodník .NETu.
         return Convert.ChangeType(value, actualType, CultureInfo.InvariantCulture);
     }
     //CRUD metody
 
-    //Metoda pro vytvoření Itemu, vrátí null při chybě
+    /// <summary>
+    /// Metoda pro vytvoření Itemu, vrátí null při chybě
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public Item? Create(Item item)
     {
         Item? result = null;
@@ -174,7 +237,12 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
         return result;
     }
 
-    //Metoda pro update Itemu, vrátí null při chybě
+    /// <summary>
+    /// Metoda pro update Itemu, vrátí null při chybě
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public Item? Update(int id, Item item)
     {
         if (Get(id) == null)
@@ -200,7 +268,11 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
         return result;
     }
 
-    //Metoda pro odstranění Itemu, vrátí null při chybě
+    /// <summary>
+    /// Metoda pro odstranění Itemu, vrátí null při chybě
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public bool? Delete(int id)
     {
         if (Get(id) == null)
@@ -231,8 +303,16 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
         return result;
     }
 
-    //Metoda pro získání Item podle id, vrátí null při nenalezení
+    /// <summary>
+    /// Metoda pro získání Item podle id, vrátí null při nenalezení
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public Item? Get(int id) => Items.SingleOrDefault(x => x.Id.Equals(id));
 
+    /// <summary>
+    /// Jednoduchá funkce pro inkrementaci Idček.
+    /// </summary>
+    /// <returns></returns>
     public int NextId() => Items.Count > 0 ? Items[Items.Count - 1].Id + 1 : 1;
 }
