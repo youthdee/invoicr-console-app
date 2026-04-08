@@ -16,9 +16,9 @@ class Program
 /*
  * TODO:
  * email validace
+ * na macu nefunguje klavesnice??
  * zvetsit sazbu alespon 2x u dodavatele
  * Menu odberatele a dodavatele se liší
- * format data absolutne nefunguje
  * celkem u faktury 2x vetsi
- * PDF vystup klidne udelejme nejak na prasaka (TXT)
+ * Vylepšit zadávání u Enum a ANO/NE
  */
