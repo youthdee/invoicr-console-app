@@ -71,11 +71,12 @@ public class Invoice : IObjectWithId<int>
 
         // hlavička 
         sb.AppendLine($"Faktura: {Number}");
+        sb.AppendLine($"Poznámka: {Note}");
 
         //obecné informace faktury (datumy)
         sb.AppendLine(new string('=', 50));
-        sb.AppendLine($"Datum vystavení: {IssueDate}");
-        sb.AppendLine($"Datum splatnosti: {DueDate}");
+        sb.AppendLine($"Datum vystavení: {IssueDate.ToString("dd.MM.yyyy")}");
+        sb.AppendLine($"Datum splatnosti: {DueDate.ToString("dd.MM.yyyy")}");
 
         //odběratel
         sb.AppendLine(new string('=', 50));

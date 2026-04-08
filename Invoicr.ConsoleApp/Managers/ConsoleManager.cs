@@ -80,15 +80,15 @@ public static class ConsoleManager
     /// <returns></returns>
     public static DateTime? ReadDate(string prompt, DateTime? defaultVal = null)
     {
-        var defStr = defaultVal?.ToString("yyyy-MM-dd");
+        var defStr = defaultVal?.ToString("dd.MM.yyyy");
         while (true)
         {
-            var raw = ReadLine(prompt + " (yyyy-MM-dd)", defStr);
+            var raw = ReadLine(prompt + " (dd.MM.yyyy)", defStr);
 
             if (raw == "/q")
                 return null;
 
-            if (DateTime.TryParseExact(raw, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+            if (DateTime.TryParseExact(raw, "dd.MM.yyyy", CultureInfo.InvariantCulture,
                     DateTimeStyles.None, out var dt))
                 return dt;
             Console.ForegroundColor = ConsoleColor.Red;

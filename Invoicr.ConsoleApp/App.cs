@@ -155,7 +155,7 @@ public class App
         int? currency = ConsoleManager.ReadInt("Měna (0 pro CZK, 1 pro EUR)", 0);
         if (currency == null)
             return;
-        string? note = ConsoleManager.ReadLine("Poznámka", $"Vytvořeno {DateTime.Now}");
+        string? note = ConsoleManager.ReadLine("Poznámka", $"Vytvořeno {DateTime.Now.ToString("dd.MM.yyyy")}");
         if (string.IsNullOrEmpty(note))
             return;
 
@@ -190,7 +190,7 @@ public class App
                 // Pokud složka neexistuje, vytvoříme ji (včetně všech podložek)
                 Directory.CreateDirectory(directory);
             }
-            
+
             File.WriteAllText(fileName, invoice.GetTextOutput(), System.Text.Encoding.UTF8);
 
             ConsoleManager.Info($"PDF výstup naleznete v: {fileName}.");
