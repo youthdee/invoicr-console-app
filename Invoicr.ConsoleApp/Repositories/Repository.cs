@@ -14,15 +14,17 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
 {
     protected readonly string FullPath;
 
-    public List<Item> Items { get; set; }
+    public List<Item> Items { get; set; } //schválně neinicializuji, abych měl jistotu že jsou data načtená
 
 
     public Repository(string path, bool preload = true)
     {
-        string? directory = Path.GetDirectoryName(path);
-        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        //když soubory a nebo cesta neexistuje, tak ji vytvořím (pokud to systém dovolí)
+        if (!File.Exists(path))
         {
-            Directory.CreateDirectory(directory);
+            //pro jistotu zkusíme vytvořit i složku, pokud už existuje tak se nic nestane
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.Create(path).Close();
         }
 
         this.FullPath = path;
@@ -91,7 +93,8 @@ public abstract class Repository<Item> where Item : class, IObjectWithId<int>, n
     // Pomocná metoda pro získání vlastností, které nejsou vnořené třídy
     protected PropertyInfo[] GetSimpleProperties()
     {
-        var allProperties = typeof(Item).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        var allProperties =
+            typeof(Item).GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         return allProperties
             .Where(p =>

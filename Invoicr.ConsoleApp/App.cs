@@ -16,11 +16,16 @@ public class App
     public App()
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string filePath = Path.Combine(baseDir, "appsettings.json");
+        string filePath1 = Path.Combine(baseDir, "appsettings.json");
+        string filePath2 = Path.Combine(baseDir, "appsettings.template.json");
 
-        if (File.Exists(filePath))
+        bool exists = File.Exists(filePath1) || File.Exists(filePath2);
+
+        if (exists)
         {
-            string jsonString = File.ReadAllText(filePath);
+            string path = File.Exists(filePath1) ? filePath1 : filePath2;
+
+            string jsonString = File.ReadAllText(path);
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             try
             {
@@ -36,7 +41,14 @@ public class App
         }
         else
         {
-            throw new InvalidOperationException("Chyba: Soubor config.json nebyl nalezen!");
+            // appSettings = new()
+            // {
+            // CsvFolder = "data/csv",
+            // InvoicePrefix = "FAK",
+            // InvoiceStartNumber = 1,
+            // InvoiceStep = 1,
+            // PdfOutputFolder = "data/pdf",
+            // };
         }
 
         //inicializace repozitářů
