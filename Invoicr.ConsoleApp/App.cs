@@ -8,25 +8,38 @@ namespace Invoicr.ConsoleApp;
 
 public class App
 {
+    //repozitáře
     private readonly SupplierRepository suplierRepository;
     private readonly ClientRepository clientRepository;
     private readonly InvoiceRepository invoiceRepository;
+
+    //nastavení aplikace
     private readonly AppSettings appSettings;
 
+    //konstruktor, inicializuje celou aplikaci
     public App()
     {
+        //pokud neexsitují appsettings.json, tak zkusíme appsettings.template.json
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string filePath1 = Path.Combine(baseDir, "appsettings.json");
         string filePath2 = Path.Combine(baseDir, "appsettings.template.json");
 
         bool exists = File.Exists(filePath1) || File.Exists(filePath2);
 
+        //pokud existují, tak parsneme json do objektu AppSettings
         if (exists)
         {
+            //určíme, jaký soubor to tedy bude - prioritu mají appsettings
             string path = File.Exists(filePath1) ? filePath1 : filePath2;
 
+            //načteme si json jako string
             string jsonString = File.ReadAllText(path);
+
+            //optiony pro deserialiuzer ignorující velká a malá písmena
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            //zkusíme parsnout do appsettings třídy
+            //system.text.json je v tomhle trochu horší než newtonsoft
             try
             {
                 appSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, options)
@@ -35,6 +48,7 @@ public class App
             catch (JsonException ex)
             {
                 Console.WriteLine($"Kritická chyba: Soubor nastavení je neplatný! {ex.Message}");
+                //rovnou ukončíme aplikaci protože bez appsettings nemá smysl (neví kde jsou CSV soubory nebo kde je má vytvořit)
                 Environment.Exit(1);
                 return;
             }
@@ -49,16 +63,21 @@ public class App
             // InvoiceStep = 1,
             // PdfOutputFolder = "data/pdf",
             // };
+            throw new NotImplementedException("Nepodařilo se najít appsettings.json / appsettings.template.json");
         }
 
-        //inicializace repozitářů
+        //inicializace repozitářů, jednotlivé vysvětlení jsou v nich
         suplierRepository = new SupplierRepository(appSettings.CsvFolder);
         clientRepository = new ClientRepository(appSettings.CsvFolder);
         invoiceRepository = new InvoiceRepository(appSettings.CsvFolder, suplierRepository, clientRepository);
     }
 
+    /// <summary>
+    /// Metoda, která aplikaci nastartuje po inicializaci (konstruktoru)
+    /// </summary>
     public void Run()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         while (true)
         {
             ConsoleManager.Header("Fakturační systém Invoicr");
@@ -81,8 +100,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda která vyvolá vytvoření faktury.
+    /// </summary>
     void CreateInvoice()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Nová faktura");
 
         if (suplierRepository.Items.Count == 0)
@@ -161,8 +184,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vypíše faktury jako tabulku
+    /// </summary>
     void ListInvoices()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Seznam faktur");
         if (invoiceRepository.Items.Count == 0)
         {
@@ -176,8 +203,12 @@ public class App
             115);
     }
 
+    /// <summary>
+    /// Metoda, která zobrazí menu dodavatelů
+    /// </summary>
     void MenuSuppliers()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         while (true)
         {
             ConsoleManager.Header("Dodavatelé");
@@ -200,8 +231,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vyvolá přidání dodavatele
+    /// </summary>
     void AddSupplier()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Nový dodavatel");
 
         Supplier? supplier = AddOrEditSupplier();
@@ -218,8 +253,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vypíše seznam dodavatelů jako tabulku
+    /// </summary>
     void ListSuppliers()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Seznam dodavatelů");
         if (suplierRepository.Items.Count == 0)
         {
@@ -233,8 +272,12 @@ public class App
             172);
     }
 
+    /// <summary>
+    /// Metoda, která vyvolá editaci dodavatele
+    /// </summary>
     void EditSupplier()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ListSuppliers();
         if (suplierRepository.Items.Count == 0) return;
         var id = ConsoleManager.ReadInt("ID dodavatele k úpravě");
@@ -255,8 +298,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vyvolá smazání dodavatele
+    /// </summary>
     void DeleteSupplier()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ListSuppliers();
         if (suplierRepository.Items.Count == 0) return;
         var id = ConsoleManager.ReadInt("ID dodavatele ke smazání");
@@ -273,8 +320,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vyvolá menu odběratelů
+    /// </summary>
     void MenuClients()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         while (true)
         {
             ConsoleManager.Header("Odběratelé");
@@ -297,8 +348,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vyvolá vytvoření odběratele
+    /// </summary>
     void AddClient()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Nový odběratel");
         var id = clientRepository.NextId();
 
@@ -317,8 +372,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která zobrazí seznam odběratelů v tabulce
+    /// </summary>
     void ListClients()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ConsoleManager.Header("Seznam odběratelů");
         if (clientRepository.Items.Count == 0)
         {
@@ -332,8 +391,12 @@ public class App
             128);
     }
 
+    /// <summary>
+    /// Metoda, která umožní editaci odběratele
+    /// </summary>
     void EditClient()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ListClients();
         if (clientRepository.Items.Count == 0) return;
         var id = ConsoleManager.ReadInt("ID dodavatele k úpravě");
@@ -353,8 +416,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která umožní odstranění odběratele
+    /// </summary>
     void DeleteClient()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         ListClients();
         if (clientRepository.Items.Count == 0) return;
         var id = ConsoleManager.ReadInt("ID odběratele ke smazání");
@@ -371,8 +438,12 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která umožní výpis nebo generaci faktur
+    /// </summary>
     void ShowOrGenerateInvoices()
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         while (true)
         {
             ConsoleManager.Header("Faktury");
@@ -390,8 +461,14 @@ public class App
         }
     }
 
+    /// <summary>
+    /// Metoda, která vytvoří nebo upraví LegalPerson
+    /// </summary>
+    /// <param name="person"></param>
+    /// <returns></returns>
     private LegalPerson? AddOrEditPerson(LegalPerson? person = null)
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         string? name = ConsoleManager.ReadLine("Zadejte název (/q pro ukončení):", person?.Name);
         if (string.IsNullOrEmpty(name))
             return null;
@@ -460,8 +537,14 @@ public class App
         return newPerson;
     }
 
+    /// <summary>
+    /// Metoda, která vytvoří nebo upraví dodavetele (za pomocí metody AddOrEditLegalPerson)
+    /// </summary>
+    /// <param name="supplier"></param>
+    /// <returns></returns>
     private Supplier? AddOrEditSupplier(Supplier? supplier = null)
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         LegalPerson? person = AddOrEditPerson(supplier);
 
         if (person == null)
@@ -540,8 +623,14 @@ public class App
         };
     }
 
+    /// <summary>
+    /// Metoda, která upraví nebo vytvoří odběratele (za pomocí metody AddOrEditLegalPerson)
+    /// </summary>
+    /// <param name="client"></param>
+    /// <returns></returns>
     private Client? AddOrEditClient(Client? client = null)
     {
+        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
         LegalPerson? person = AddOrEditPerson(client);
 
 
