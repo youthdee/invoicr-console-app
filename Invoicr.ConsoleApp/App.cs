@@ -82,9 +82,9 @@ public class App
         {
             ConsoleManager.Header("Fakturační systém Invoicr");
             ConsoleManager.MenuItem(1, "Vytvořit novou fakturu");
-            ConsoleManager.MenuItem(2, "Upravit seznam dodavatelů");
-            ConsoleManager.MenuItem(3, "Upravit seznam odběratelů");
-            ConsoleManager.MenuItem(4, "Zobrazit nebo generovat faktury");
+            ConsoleManager.MenuItem(2, "Zobrazit seznam faktur");
+            ConsoleManager.MenuItem(3, "Upravit seznam dodavatelů");
+            ConsoleManager.MenuItem(4, "Upravit seznam odběratelů");
             ConsoleManager.Separator();
             ConsoleManager.MenuItem(0, "Ukončit");
 
@@ -92,9 +92,9 @@ public class App
             switch (choice)
             {
                 case 1: CreateInvoice(); break;
-                case 2: MenuSuppliers(); break;
-                case 3: MenuClients(); break;
-                case 4: ShowOrGenerateInvoices(); break;
+                case 2: ListInvoices(); break;
+                case 3: MenuSuppliers(); break;
+                case 4: MenuClients(); break;
                 case 0: return;
             }
         }
@@ -209,6 +209,7 @@ public class App
     void MenuSuppliers()
     {
         //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
+        ListSuppliers();
         while (true)
         {
             ConsoleManager.Header("Dodavatelé");
@@ -326,6 +327,7 @@ public class App
     void MenuClients()
     {
         //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
+        ListClients();
         while (true)
         {
             ConsoleManager.Header("Odběratelé");
@@ -435,29 +437,6 @@ public class App
         }
         else
         {
-        }
-    }
-
-    /// <summary>
-    /// Metoda, která umožní výpis nebo generaci faktur
-    /// </summary>
-    void ShowOrGenerateInvoices()
-    {
-        //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
-        while (true)
-        {
-            ConsoleManager.Header("Faktury");
-            ConsoleManager.MenuItem(1, "Seznam faktur");
-            ConsoleManager.MenuItem(2, "Znovu vygenerovat fakturu");
-            ConsoleManager.MenuItem(0, "Zpět");
-
-            int choice = ConsoleManager.ReadChoice(0, 2);
-            switch (choice)
-            {
-                case 1: ListInvoices(); break;
-                case 2: ListInvoices(); break; //TODO!
-                case 0: return;
-            }
         }
     }
 
