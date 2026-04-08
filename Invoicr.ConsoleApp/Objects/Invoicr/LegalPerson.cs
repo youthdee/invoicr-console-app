@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Invoicr.Repositories;
 
 namespace Invoicr.Objects;
@@ -25,7 +26,7 @@ public class LegalPerson : IObjectWithId<int>
     public Address Address { get; set; } = new Address();
 
     //internal  properties pro repozitář, aby uložil adresu do CSV. (neukládá složité objekty)
-    //trochu hack, ale co se dá dělat.
+    //trochu hack, ale vzhledem k vybrané architektuře je to docela čisté řešení.
 
     internal string Street
     {
@@ -50,15 +51,32 @@ public class LegalPerson : IObjectWithId<int>
         get => Address.Number;
         set => Address.Number = value;
     }
+
     public string Email { get; set; }
 
     //Jednoduchá regex funkce, která bez výstupu zvaliduje email (Platný / neplatný).
+    //Byla vytvořena AI
+    //prompt: pomocí inline regexu dodělej tuhle funkci {název funkce a parameter} (GEMINI PRO)
     public bool ValidateEmail(string email)
     {
-        return true;
+        if (string.IsNullOrWhiteSpace(email)) return false;
+
+        // Inline regex: 
+        // ^[^@\s]+     -> začátek, cokoli kromě zavináče a mezer
+        // @            -> musí tam být zavináč
+        // [^@\s]+      -> doména (cokoli kromě @ a mezer)
+        // \.           -> musí tam být tečka
+        // [^@\s]+$     -> koncovka a konec řetězce
+        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
     }
+
+    /// <summary>
+    /// Override metody ToString() pro snažší výpis v konzoli.
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
-        return $"| {Id,-4} | {Name,-25} | {ICO,-10} | {(VatPayer ? "Ano" : "Ne"),-3} | {Address.ToString(),-45} | {Email,-25} |";
+        return
+            $"| {Id,-4} | {Name,-25} | {ICO,-10} | {(VatPayer ? "Ano" : "Ne"),-3} | {Address.ToString(),-45} | {Email,-25} |";
     }
 }

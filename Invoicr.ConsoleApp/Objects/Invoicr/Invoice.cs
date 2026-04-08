@@ -43,9 +43,15 @@ public class Invoice : IObjectWithId<int>
         set => _hourRate = value;
     }
 
+    // Měna jako enum pro přehlednost a typovou kontrolu.
     public Currency Currency { get; set; }
-    public string Note { get; set; }
+    // Popis faktury, defaultně datum vytvoření.
+    public string? Note { get; set; }
 
+    /// <summary>
+    /// Override metody ToString() pro snažší výpis v konzoli.
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         decimal total = HoursWorked * HourRate;

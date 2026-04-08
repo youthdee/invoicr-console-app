@@ -3,8 +3,13 @@ namespace Invoicr.Objects;
 //dodavatel dědí od třídy LegalPerson, protože psát boilerplate kód je neefektivní
 public class Supplier : LegalPerson
 {
+    // Cizí objekt bankovního účtu
+    // Nemá FK, protože nemá ani tabulku (CSV)
+    // Slouží jen jako syntax sugar
     public BankAccount? BankAccount { get; set; }
 
+    //internal  properties pro repozitář, aby uložil adresu do CSV. (neukládá složité objekty)
+    //trochu hack, ale vzhledem k vybrané architektuře je to docela čisté řešení.
     internal long? AccountNumber
     {
         get => BankAccount?.AccountNumber;
@@ -37,10 +42,17 @@ public class Supplier : LegalPerson
             BankAccount.Prefix = value;
         }
     }
+
+    // hodinová sazba která může být defaultně použita při tvorbě faktur
     public decimal? HourRate { get; set; }
 
+    // měna hodinové sazby 
     public Currency? HourRateCurrency { get; set; }
 
+    /// <summary>
+    /// Override metody ToString() pro snažší výpis v konzoli.
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         string baseData = base.ToString().TrimEnd('|');
