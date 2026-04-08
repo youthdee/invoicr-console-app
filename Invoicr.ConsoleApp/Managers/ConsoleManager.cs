@@ -32,17 +32,21 @@ public static class ConsoleManager
         => Console.WriteLine("  " + new string('─', 40));
 
     /// <summary>
-    /// Funkce pro přečtení volby, co uživatel zadal. Volba musí existovat a musí být notnull int.
+    /// Funkce pro přečtení volby, co uživatel zadal. Volba musí existovat a musí být notnull int. Pokud uživatel zadá řetězec /q tak se operace zruší.
     /// </summary>
     /// <param name="min"></param>
     /// <param name="max"></param>
     /// <returns></returns>
-    public static int ReadChoice(int min, int max)
+    public static int? ReadChoice(int min, int max)
     {
         while (true)
         {
             Console.Write("  > ");
             var input = Console.ReadLine()?.Trim();
+            
+            if (input == "/q")
+                return null;
+            
             if (int.TryParse(input, out int choice) && choice >= min && choice <= max)
             {
                 Console.Clear();

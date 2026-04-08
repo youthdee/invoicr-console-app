@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using Invoicr.Managers;
 using Invoicr.Objects;
@@ -89,7 +90,8 @@ public class App
             ConsoleManager.Separator();
             ConsoleManager.MenuItem(0, "Ukončit");
 
-            int choice = ConsoleManager.ReadChoice(0, 4);
+            int? choice = ConsoleManager.ReadChoice(0, 4);
+            if (choice == null) return;
             switch (choice)
             {
                 case 1: CreateInvoice(); break;
@@ -126,15 +128,17 @@ public class App
             ConsoleManager.Info(
                 $"  [{i + 1}] {suplierRepository.Items[i].Name} (IČO: {suplierRepository.Items[i].ICO})");
         ConsoleManager.Info($"  Vyberte 1–{suplierRepository.Items.Count}:");
-        int si = ConsoleManager.ReadChoice(1, suplierRepository.Items.Count) - 1;
-        Supplier supplier = suplierRepository.Items[si];
+        int? si = ConsoleManager.ReadChoice(1, suplierRepository.Items.Count) - 1;
+        if (si == null) return;
+        Supplier supplier = suplierRepository.Items[si.Value];
 
         ConsoleManager.Info("Odběratelé:");
         for (int i = 0; i < clientRepository.Items.Count; i++)
             ConsoleManager.Info($"  [{i + 1}] {clientRepository.Items[i].Name} (IČO: {clientRepository.Items[i].ICO})");
         ConsoleManager.Info($"  Vyberte 1–{clientRepository.Items.Count}:");
-        int ci = ConsoleManager.ReadChoice(1, clientRepository.Items.Count) - 1;
-        Client client = clientRepository.Items[ci];
+        int? ci = ConsoleManager.ReadChoice(1, clientRepository.Items.Count) - 1;
+        if (ci == null) return;
+        Client client = clientRepository.Items[ci.Value];
 
         string number =
             $"{appSettings.InvoicePrefix}{(appSettings.InvoiceStartNumber + appSettings.InvoiceStep * invoiceRepository.Items.Count()):D4}";
@@ -236,7 +240,8 @@ public class App
             ConsoleManager.Separator();
             ConsoleManager.MenuItem(0, "Zpět");
 
-            int choice = ConsoleManager.ReadChoice(0, 4);
+            int? choice = ConsoleManager.ReadChoice(0, 4);
+            if (choice == null) return;
             switch (choice)
             {
                 case 1: AddSupplier(); break;
@@ -354,7 +359,8 @@ public class App
             ConsoleManager.Separator();
             ConsoleManager.MenuItem(0, "Zpět");
 
-            int choice = ConsoleManager.ReadChoice(0, 4);
+            int? choice = ConsoleManager.ReadChoice(0, 4);
+            if (choice == null) return;
             switch (choice)
             {
                 case 1: AddClient(); break;
