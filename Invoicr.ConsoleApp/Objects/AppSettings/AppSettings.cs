@@ -2,18 +2,19 @@ namespace Invoicr.Objects.AppSettings;
 
 public class AppSettings
 {
+    //Required protože chci mít jistotu, že se app settings načtou. Jinak aplikace nemá smysl protože nemá kde najít pracovní soubory.
     //prefix faktur
-    public string InvoicePrefix { get; set; } = "FAK";
+    public required string InvoicePrefix { get; set; }
 
     //starovní číslo faktur - podle roku třeba - 2026001
-    public int InvoiceStartNumber { get; set; } = 1;
+    public required int InvoiceStartNumber { get; set; }
 
     //krokování faktur
-    public int InvoiceStep { get; set; } = 1;
+    public required int InvoiceStep { get; set; }
 
     // Složka výtupu vygenerovaných PDFek.
-    public string PdfOutputFolder { get; set; } = "output/pdf";
+    public required string PdfOutputFolder { get; set; }
 
     // Interní složka datových souborů. Dalo by se říct, že to je taková hodně lehká databáze.
-    public string CsvFolder { get; set; } = "data/csv";
+    public required string CsvFolder { get; set; }
 }

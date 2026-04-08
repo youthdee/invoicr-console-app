@@ -22,7 +22,17 @@ public class App
         {
             string jsonString = File.ReadAllText(filePath);
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            appSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, options)!;
+            try
+            {
+                appSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, options)
+                              ?? throw new InvalidOperationException("Nepodařilo se načíst appsettings.json");
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Kritická chyba: Soubor nastavení je neplatný! {ex.Message}");
+                Environment.Exit(1);
+                return;
+            }
         }
         else
         {
@@ -90,7 +100,8 @@ public class App
         int ci = ConsoleManager.ReadChoice(1, clientRepository.Items.Count) - 1;
         Client client = clientRepository.Items[ci];
 
-        string number = $"{appSettings.InvoicePrefix}{(appSettings.InvoiceStartNumber + appSettings.InvoiceStep * invoiceRepository.Items.Count()):D4}";
+        string number =
+            $"{appSettings.InvoicePrefix}{(appSettings.InvoiceStartNumber + appSettings.InvoiceStep * invoiceRepository.Items.Count()):D4}";
         ConsoleManager.Info($"Číslo faktury: {number}");
 
         DateTime? issueDate = ConsoleManager.ReadDate("Datum vystavení", DateTime.Today);
@@ -146,6 +157,7 @@ public class App
             ConsoleManager.Info("Žádné faktury.");
             return;
         }
+
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Faktury", invoiceRepository.Items,
             $"| {"ID",-4} | {"ČÍSLO",-12} | {"VYSTAVENO",-10} | {"SPLATNOST",-10} | {"CELKEM",-14} | {"DODAVATEL",-20} | {"ODBĚRATEL",-20} |",
@@ -202,6 +214,7 @@ public class App
             ConsoleManager.Info("Žádní dodavatelé.");
             return;
         }
+
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Dodavatelé", suplierRepository.Items,
             $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} | {"SAZBA",-12} | {"BANKOVNÍ ÚČET",-25} |",
@@ -300,6 +313,7 @@ public class App
             ConsoleManager.Info("Žádní odběratelé.");
             return;
         }
+
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Odběratelé", clientRepository.Items,
             $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} |",
@@ -378,7 +392,8 @@ public class App
         if (ico == null)
             return null;
 
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení):", person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
+        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení):",
+            person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
         if (vatPayer == null)
             return null;
 
@@ -431,7 +446,6 @@ public class App
         };
 
         return newPerson;
-
     }
 
     private Supplier? AddOrEditSupplier(Supplier? supplier = null)
@@ -449,11 +463,13 @@ public class App
         BankAccount? bankAccount = null;
         if (hasBankAccount == 1)
         {
-            long? accountNumber = ConsoleManager.ReadLong("Zadejte číslo účtu (/q pro ukončení):", supplier?.BankAccount?.AccountNumber);
+            long? accountNumber = ConsoleManager.ReadLong("Zadejte číslo účtu (/q pro ukončení):",
+                supplier?.BankAccount?.AccountNumber);
             if (accountNumber == null)
                 return null;
 
-            int? bankNumber = ConsoleManager.ReadInt("Zadejte číslo banky (/q pro ukončení):", supplier?.BankAccount?.BankNumber);
+            int? bankNumber = ConsoleManager.ReadInt("Zadejte číslo banky (/q pro ukončení):",
+                supplier?.BankAccount?.BankNumber);
             if (bankNumber == null)
                 return null;
 
@@ -464,7 +480,8 @@ public class App
             int? prefix = null;
             if (hasPrefix == 1)
             {
-                prefix = ConsoleManager.ReadInt($"Zadejte předčíslí k účtu {accountNumber} (/q pro ukončení):", supplier?.BankAccount?.Prefix);
+                prefix = ConsoleManager.ReadInt($"Zadejte předčíslí k účtu {accountNumber} (/q pro ukončení):",
+                    supplier?.BankAccount?.Prefix);
                 if (prefix == null)
                     return null;
             }
@@ -490,7 +507,8 @@ public class App
             if (hourRate == null)
                 return null;
 
-            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení):", (int?)supplier?.HourRateCurrency ?? 0);
+            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení):",
+                (int?)supplier?.HourRateCurrency ?? 0);
             if (hourRateCurreny == null)
                 return null;
         }
@@ -529,5 +547,4 @@ public class App
             Name = person.Name
         };
     }
-
 }
