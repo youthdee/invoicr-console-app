@@ -15,8 +15,6 @@ class Program
 
 /*
  * TODO:
- * email validace
- * na macu nefunguje klavesnice??
  * zvetsit sazbu alespon 2x u dodavatele
  * Menu odberatele a dodavatele se liší
  * celkem u faktury 2x vetsi

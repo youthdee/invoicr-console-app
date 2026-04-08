@@ -285,8 +285,8 @@ public class App
 
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Dodavatelé", suplierRepository.Items,
-            $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} | {"SAZBA",-12} | {"BANKOVNÍ ÚČET",-25} |",
-            172);
+            $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-26} | {"SAZBA",-29} | {"BANKOVNÍ ÚČET",-25} |",
+            192);
     }
 
     /// <summary>

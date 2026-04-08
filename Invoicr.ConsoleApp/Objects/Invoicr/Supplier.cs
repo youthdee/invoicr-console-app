@@ -56,6 +56,6 @@ public class Supplier : LegalPerson
     public override string ToString()
     {
         string baseData = base.ToString().TrimEnd('|');
-        return $"{baseData} | {HourRate,8:N2} {HourRateCurrency,-3} | {BankAccount?.ToString() ?? "N/A",-25} |";
+        return $"{baseData} | {HourRate,24:N2} {HourRateCurrency,-4} | {BankAccount?.ToString() ?? "N/A",-25} |";
     }
 }
