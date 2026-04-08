@@ -505,7 +505,7 @@ public class App
         if (string.IsNullOrEmpty(number))
             return null;
 
-        string? email = ConsoleManager.ReadLine("Zadejte kontaktní email (/q pro ukončení)", person?.Email);
+        string? email = ConsoleManager.ReadEmail("Zadejte kontaktní email (/q pro ukončení)", person?.Email);
         if (string.IsNullOrEmpty(email))
             return null;
 

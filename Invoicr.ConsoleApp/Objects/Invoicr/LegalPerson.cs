@@ -53,23 +53,7 @@ public class LegalPerson : IObjectWithId<int>
     }
 
     public string Email { get; set; }
-
-    //Jednoduchá regex funkce, která bez výstupu zvaliduje email (Platný / neplatný).
-    //Byla vytvořena AI
-    //prompt: pomocí inline regexu dodělej tuhle funkci {název funkce a parameter} (GEMINI PRO)
-    public bool ValidateEmail(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email)) return false;
-
-        // Inline regex: 
-        // ^[^@\s]+     -> začátek, cokoli kromě zavináče a mezer
-        // @            -> musí tam být zavináč
-        // [^@\s]+      -> doména (cokoli kromě @ a mezer)
-        // \.           -> musí tam být tečka
-        // [^@\s]+$     -> koncovka a konec řetězce
-        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
-    }
-
+    
     /// <summary>
     /// Override metody ToString() pro snažší výpis v konzoli.
     /// </summary>

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Invoicr.Managers;
 
@@ -49,7 +50,7 @@ public static class ConsoleManager
             }
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"  Zadej číslo {min}–{max}.");
+            Console.WriteLine($"  Zadejte číslo {min}–{max}.");
             Console.ResetColor();
         }
     }
@@ -92,7 +93,7 @@ public static class ConsoleManager
                     DateTimeStyles.None, out var dt))
                 return dt;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("  Špatný formát data.");
+            Console.WriteLine("  Špatný formát data. (dd.MM.yyyy)");
             Console.ResetColor();
         }
     }
@@ -116,7 +117,7 @@ public static class ConsoleManager
             if (int.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("  Zadej číslo.");
+            Console.WriteLine("  Zadejte číslo.");
             Console.ResetColor();
         }
     }
@@ -140,7 +141,7 @@ public static class ConsoleManager
             if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("  Zadej číslo (desetinná tečka).");
+            Console.WriteLine("  Zadejte číslo (desetinná tečka).");
             Console.ResetColor();
         }
     }
@@ -164,7 +165,25 @@ public static class ConsoleManager
             if (long.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("  Zadej číslo.");
+            Console.WriteLine("  Zadejte číslo.");
+            Console.ResetColor();
+        }
+    }
+
+    public static string? ReadEmail(string prompt, string? defaultVal = null)
+    {
+        var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
+        while (true)
+        {
+            var raw = ReadLine(prompt, defStr);
+
+            if (raw == "/q")
+                return null;
+
+            if (ValidateEmail(raw ?? ""))
+                return raw;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("  Zadejte platný email..");
             Console.ResetColor();
         }
     }
@@ -229,5 +248,21 @@ public static class ConsoleManager
         }
 
         Console.WriteLine(new string('-', width));
+    }
+
+    //Jednoduchá regex funkce, která bez výstupu zvaliduje email (Platný / neplatný).
+    //Byla vytvořena AI
+    //prompt: pomocí inline regexu dodělej tuhle funkci {název funkce a parameter} (GEMINI PRO)
+    private static bool ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return false;
+
+        // Inline regex: 
+        // ^[^@\s]+     -> začátek, cokoli kromě zavináče a mezer
+        // @            -> musí tam být zavináč
+        // [^@\s]+      -> doména (cokoli kromě @ a mezer)
+        // \.           -> musí tam být tečka
+        // [^@\s]+$     -> koncovka a konec řetězce
+        return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
     }
 }
