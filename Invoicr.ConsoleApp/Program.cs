@@ -15,8 +15,5 @@ class Program
 
 /*
  * TODO:
- * zvetsit sazbu alespon 2x u dodavatele
- * Menu odberatele a dodavatele se liší
- * celkem u faktury 2x vetsi
  * Vylepšit zadávání u Enum a ANO/NE
  */

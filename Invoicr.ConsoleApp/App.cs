@@ -127,7 +127,7 @@ public class App
         for (int i = 0; i < suplierRepository.Items.Count; i++)
             ConsoleManager.Info(
                 $"  [{i + 1}] {suplierRepository.Items[i].Name} (IČO: {suplierRepository.Items[i].ICO})");
-        ConsoleManager.Info($"  Vyberte 1–{suplierRepository.Items.Count}:");
+        ConsoleManager.Info($"  Vyberte 1–{suplierRepository.Items.Count} (/q pro ukončení):");
         int? si = ConsoleManager.ReadChoice(1, suplierRepository.Items.Count) - 1;
         if (si == null) return;
         Supplier supplier = suplierRepository.Items[si.Value];
@@ -135,7 +135,7 @@ public class App
         ConsoleManager.Info("Odběratelé:");
         for (int i = 0; i < clientRepository.Items.Count; i++)
             ConsoleManager.Info($"  [{i + 1}] {clientRepository.Items[i].Name} (IČO: {clientRepository.Items[i].ICO})");
-        ConsoleManager.Info($"  Vyberte 1–{clientRepository.Items.Count}:");
+        ConsoleManager.Info($"  Vyberte 1–{clientRepository.Items.Count} (/q pro ukončení):");
         int? ci = ConsoleManager.ReadChoice(1, clientRepository.Items.Count) - 1;
         if (ci == null) return;
         Client client = clientRepository.Items[ci.Value];
@@ -144,22 +144,22 @@ public class App
             $"{appSettings.InvoicePrefix}{(appSettings.InvoiceStartNumber + appSettings.InvoiceStep * invoiceRepository.Items.Count()):D4}";
         ConsoleManager.Info($"Číslo faktury: {number}");
 
-        DateTime? issueDate = ConsoleManager.ReadDate("Datum vystavení", DateTime.Today);
+        DateTime? issueDate = ConsoleManager.ReadDate("Datum vystavení (/q pro ukončení)", DateTime.Today);
         if (issueDate == null)
             return;
-        DateTime? dueDate = ConsoleManager.ReadDate("Datum splatnosti", DateTime.Today.AddDays(14));
+        DateTime? dueDate = ConsoleManager.ReadDate("Datum splatnosti (/q pro ukončení)", DateTime.Today.AddDays(14));
         if (dueDate == null)
             return;
-        decimal? hours = ConsoleManager.ReadDecimal("Odpracované hodiny");
+        decimal? hours = ConsoleManager.ReadDecimal("Odpracované hodiny (/q pro ukončení)");
         if (hours == null)
             return;
-        decimal? rate = ConsoleManager.ReadDecimal("Hodinová sazba", supplier.HourRate);
+        decimal? rate = ConsoleManager.ReadDecimal("Hodinová sazba (/q pro ukončení)", supplier.HourRate);
         if (rate == null)
             return;
-        int? currency = ConsoleManager.ReadInt("Měna (0 pro CZK, 1 pro EUR)", 0);
+        int? currency = ConsoleManager.ReadInt("Měna (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 0);
         if (currency == null)
             return;
-        string? note = ConsoleManager.ReadLine("Poznámka", $"Vytvořeno {DateTime.Now.ToString("dd.MM.yyyy")}");
+        string? note = ConsoleManager.ReadLine("Poznámka (/q pro ukončení)", $"Vytvořeno {DateTime.Now.ToString("dd.MM.yyyy")}");
         if (string.IsNullOrEmpty(note))
             return;
 
@@ -197,7 +197,7 @@ public class App
 
             File.WriteAllText(fileName, invoice.GetTextOutput(), System.Text.Encoding.UTF8);
 
-            ConsoleManager.Info($"PDF výstup naleznete v: {fileName}.");
+            ConsoleManager.Info($"TXT výstup naleznete v: {fileName}.");
         }
         else
         {
@@ -482,7 +482,7 @@ public class App
         if (ico == null)
             return null;
 
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení)",
+        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE",
             person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
         if (vatPayer == null)
             return null;
@@ -552,7 +552,9 @@ public class App
             return null;
 
 
-        int? hasBankAccount = ConsoleManager.ReadInt("Chcete přidat i bankovní účet?");
+        int? hasBankAccount =
+            ConsoleManager.ReadInt(
+                "Chcete přidat i bankovní účet? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 1);
         if (hasBankAccount == null)
             return null;
 
@@ -569,7 +571,9 @@ public class App
             if (bankNumber == null)
                 return null;
 
-            int? hasPrefix = ConsoleManager.ReadInt("Přejete si zadat i předčíslí účtu? (0 pro NE, 1 pro ANO", 0);
+            int? hasPrefix =
+                ConsoleManager.ReadInt(
+                    "Přejete si zadat i předčíslí účtu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 0);
             if (hasPrefix == null)
                 return null;
 
@@ -591,7 +595,10 @@ public class App
         }
 
 
-        int? hasHourRate = ConsoleManager.ReadInt("Přejete si zadat výchozí hodinovou sazbu? (0 pro NE, 1 pro ANO", 1);
+        int? hasHourRate =
+            ConsoleManager.ReadInt(
+                "Přejete si zadat výchozí hodinovou sazbu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE",
+                1);
         if (hasHourRate == null)
             return null;
 
