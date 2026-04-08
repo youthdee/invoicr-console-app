@@ -1,3 +1,4 @@
+using System.Text;
 using Invoicr.Repositories;
 
 namespace Invoicr.Objects;
@@ -45,6 +46,7 @@ public class Invoice : IObjectWithId<int>
 
     // Měna jako enum pro přehlednost a typovou kontrolu.
     public Currency Currency { get; set; }
+
     // Popis faktury, defaultně datum vytvoření.
     public string? Note { get; set; }
 
@@ -55,6 +57,75 @@ public class Invoice : IObjectWithId<int>
     public override string ToString()
     {
         decimal total = HoursWorked * HourRate;
-        return $"| {Id,-4} | {Number,-12} | {IssueDate:dd.MM.yyyy} | {DueDate:dd.MM.yyyy} | {total,10:N2} {Currency,-3} | {Supplier.Name,-20} | {Client.Name,-20} |";
+        return
+            $"| {Id,-4} | {Number,-12} | {IssueDate:dd.MM.yyyy} | {DueDate:dd.MM.yyyy} | {total,10:N2} {Currency,-3} | {Supplier.Name,-20} | {Client.Name,-20} |";
+    }
+
+    /// <summary>
+    /// Metoda pro hezké vypsání faktury jako textový výstup.
+    /// </summary>
+    /// <returns></returns>
+    public string GetTextOutput()
+    {
+        StringBuilder sb = new();
+
+        // hlavička 
+        sb.AppendLine($"Faktura: {Number}");
+
+        //obecné informace faktury (datumy)
+        sb.AppendLine(new string('=', 50));
+        sb.AppendLine($"Datum vystavení: {IssueDate}");
+        sb.AppendLine($"Datum splatnosti: {DueDate}");
+
+        //odběratel
+        sb.AppendLine(new string('=', 50));
+        sb.AppendLine($"Odběratel: {Client.Name}");
+        sb.AppendLine($"IČO: {Client.ICO}");
+        sb.AppendLine($"Plátce DPH: {Client.VatPayer}");
+        if (Client.VatPayer)
+        {
+            sb.AppendLine($"DIČ: {Client.DIC}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"Adresa: {Client.Address.ToString()}");
+        sb.AppendLine($"Email: {Client.Email}");
+        sb.AppendLine();
+        sb.AppendLine($"Poznámka: {Client.Description}");
+
+        //dodavatel
+        sb.AppendLine(new string('=', 50));
+        sb.AppendLine($"Dodavatel: {Supplier.Name}");
+        sb.AppendLine($"IČO: {Supplier.ICO}");
+        sb.AppendLine($"Plátce DPH: {Supplier.VatPayer}");
+        if (Client.VatPayer)
+        {
+            sb.AppendLine($"DIČ: {Supplier.DIC}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"Adresa: {Supplier.Address.ToString()}");
+        sb.AppendLine($"Email: {Supplier.Email}");
+        if (Supplier.BankAccount != null)
+        {
+            sb.AppendLine();
+            sb.AppendLine($"Bankovní účet: {Supplier.BankAccount?.ToString()}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"Poznámka: {Supplier.Description}");
+
+        sb.AppendLine(new string('=', 50));
+        sb.AppendLine($"Celkem k úhradě: {HourRate * HoursWorked} {Currency.ToString()}");
+        sb.AppendLine($"Celkem položek (odpracovaných hodin): {HoursWorked}");
+        sb.AppendLine($"Celkem cena za položku vč. DPH: {HourRate}");
+
+        sb.AppendLine();
+        sb.AppendLine(
+            $"Fakturujeme Vám zboží dle objednávky: " +
+            $"{HourRate * HoursWorked} {Currency.ToString()}, " +
+            $"{(Supplier.BankAccount is not null ? $"převodem na bank. účet {Supplier?.BankAccount?.ToString()}" : "hotově")}.");
+
+        return sb.ToString();
     }
 }

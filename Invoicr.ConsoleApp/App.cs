@@ -1,3 +1,4 @@
+using System.Text;
 using Invoicr.Managers;
 using Invoicr.Objects;
 using Invoicr.Objects.AppSettings;
@@ -177,7 +178,22 @@ public class App
         if (invoiceRepository.Create(invoice) != null)
         {
             ConsoleManager.Success($"Faktura {number} uložena. Celkem: {hours * rate:N2} {currency}");
-            ConsoleManager.Info($"PDF výstup naleznete v: {appSettings.PdfOutputFolder}");
+
+            //vytvořit výstup
+
+            string fileName = Path.Combine(appSettings.PdfOutputFolder, $"{invoice.Number}.txt");
+
+            string? directory = Path.GetDirectoryName(fileName);
+
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                // Pokud složka neexistuje, vytvoříme ji (včetně všech podložek)
+                Directory.CreateDirectory(directory);
+            }
+            
+            File.WriteAllText(fileName, invoice.GetTextOutput(), System.Text.Encoding.UTF8);
+
+            ConsoleManager.Info($"PDF výstup naleznete v: {fileName}.");
         }
         else
         {

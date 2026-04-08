@@ -12,3 +12,13 @@ class Program
         new App().Run();
     }
 }
+
+/*
+ * TODO:
+ * email validace
+ * zvetsit sazbu alespon 2x u dodavatele
+ * Menu odberatele a dodavatele se liší
+ * format data absolutne nefunguje
+ * celkem u faktury 2x vetsi
+ * PDF vystup klidne udelejme nejak na prasaka (TXT)
+ */
