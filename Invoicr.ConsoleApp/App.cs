@@ -412,7 +412,7 @@ public class App
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Odběratelé", clientRepository.Items,
             $"| {"ID",-4} | {"NÁZEV",-25} | {"IČO",-10} | {"DPH",-3} | {"ADRESA",-45} | {"EMAIL",-25} |",
-            128);
+            131);
     }
 
     /// <summary>
