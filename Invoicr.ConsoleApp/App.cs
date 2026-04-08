@@ -448,19 +448,19 @@ public class App
     private LegalPerson? AddOrEditPerson(LegalPerson? person = null)
     {
         //všechny vysvětlivky jsou napsané přímo v metodách, abych to nemusel furt psát.
-        string? name = ConsoleManager.ReadLine("Zadejte název (/q pro ukončení):", person?.Name);
+        string? name = ConsoleManager.ReadLine("Zadejte název (/q pro ukončení)", person?.Name);
         if (string.IsNullOrEmpty(name))
             return null;
 
-        string? description = ConsoleManager.ReadLine("Zadejte popis (/q pro ukončení):", person?.Description);
+        string? description = ConsoleManager.ReadLine("Zadejte popis (/q pro ukončení)", person?.Description);
         if (string.IsNullOrEmpty(description))
             return null;
 
-        int? ico = ConsoleManager.ReadInt("Zadejte IČO (/q pro ukončení):", person?.ICO);
+        int? ico = ConsoleManager.ReadInt("Zadejte IČO (/q pro ukončení)", person?.ICO);
         if (ico == null)
             return null;
 
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení):",
+        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (0 pro NE, 1 pro ANO) (/q pro ukončení)",
             person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
         if (vatPayer == null)
             return null;
@@ -468,28 +468,28 @@ public class App
         int? dic = null;
         if (vatPayer == 1)
         {
-            dic = ConsoleManager.ReadInt("Zadejte DIČ (/q pro ukončení):", person?.DIC);
+            dic = ConsoleManager.ReadInt("Zadejte DIČ (/q pro ukončení)", person?.DIC);
             if (dic == null)
                 return null;
         }
 
-        string? street = ConsoleManager.ReadLine("Zadejte ulici (/q pro ukončení):", person?.Address.Street);
+        string? street = ConsoleManager.ReadLine("Zadejte ulici (/q pro ukončení)", person?.Address.Street);
         if (string.IsNullOrEmpty(street))
             return null;
 
-        int? psc = ConsoleManager.ReadInt("Zadejte PSČ (/q pro ukončení):", person?.Address.PSC);
+        int? psc = ConsoleManager.ReadInt("Zadejte PSČ (/q pro ukončení)", person?.Address.PSC);
         if (psc == null)
             return null;
 
-        string? city = ConsoleManager.ReadLine("Zadejte město (/q pro ukončení):", person?.Address.City);
+        string? city = ConsoleManager.ReadLine("Zadejte město (/q pro ukončení)", person?.Address.City);
         if (string.IsNullOrEmpty(city))
             return null;
 
-        string? number = ConsoleManager.ReadLine("Zadejte číslo popisné (/q pro ukončení):", person?.Address.Number);
+        string? number = ConsoleManager.ReadLine("Zadejte číslo popisné (/q pro ukončení)", person?.Address.Number);
         if (string.IsNullOrEmpty(number))
             return null;
 
-        string? email = ConsoleManager.ReadLine("Zadejte kontaktní email (/q pro ukončení):", person?.Email);
+        string? email = ConsoleManager.ReadLine("Zadejte kontaktní email (/q pro ukončení)", person?.Email);
         if (string.IsNullOrEmpty(email))
             return null;
 
@@ -537,12 +537,12 @@ public class App
         BankAccount? bankAccount = null;
         if (hasBankAccount == 1)
         {
-            long? accountNumber = ConsoleManager.ReadLong("Zadejte číslo účtu (/q pro ukončení):",
+            long? accountNumber = ConsoleManager.ReadLong("Zadejte číslo účtu (/q pro ukončení)",
                 supplier?.BankAccount?.AccountNumber);
             if (accountNumber == null)
                 return null;
 
-            int? bankNumber = ConsoleManager.ReadInt("Zadejte číslo banky (/q pro ukončení):",
+            int? bankNumber = ConsoleManager.ReadInt("Zadejte číslo banky (/q pro ukončení)",
                 supplier?.BankAccount?.BankNumber);
             if (bankNumber == null)
                 return null;
@@ -554,7 +554,7 @@ public class App
             int? prefix = null;
             if (hasPrefix == 1)
             {
-                prefix = ConsoleManager.ReadInt($"Zadejte předčíslí k účtu {accountNumber} (/q pro ukončení):",
+                prefix = ConsoleManager.ReadInt($"Zadejte předčíslí k účtu {accountNumber} (/q pro ukončení)",
                     supplier?.BankAccount?.Prefix);
                 if (prefix == null)
                     return null;
@@ -577,11 +577,11 @@ public class App
         int? hourRateCurreny = null;
         if (hasHourRate == 1)
         {
-            hourRate = ConsoleManager.ReadInt("Zadejte hodinovou sazbu (/q pro ukončení):");
+            hourRate = ConsoleManager.ReadInt("Zadejte hodinovou sazbu (/q pro ukončení)");
             if (hourRate == null)
                 return null;
 
-            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení):",
+            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení)",
                 (int?)supplier?.HourRateCurrency ?? 0);
             if (hourRateCurreny == null)
                 return null;
