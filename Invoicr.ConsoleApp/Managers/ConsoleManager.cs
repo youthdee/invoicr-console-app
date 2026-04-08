@@ -43,10 +43,13 @@ public static class ConsoleManager
         {
             Console.Write("  > ");
             var input = Console.ReadLine()?.Trim();
-            
+
             if (input == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
-            
+            }
+
             if (int.TryParse(input, out int choice) && choice >= min && choice <= max)
             {
                 Console.Clear();
@@ -67,13 +70,21 @@ public static class ConsoleManager
     /// <param name="prompt"></param>
     /// <param name="defaultVal"></param>
     /// <returns></returns>
-    public static string? ReadLine(string prompt, string? defaultVal = null)
+    public static string? ReadLine(string prompt, string? defaultVal = null, bool ignoreCancel = false)
     {
         var hint = defaultVal is not null ? $" [{defaultVal}]" : "";
         Console.Write($"  {prompt}{hint}: ");
         var val = Console.ReadLine()?.Trim();
-        if (val == "/q")
-            return null;
+
+        if (!ignoreCancel)
+        {
+            if (val == "/q")
+            {
+                Error("Operace byla zrušena.");
+                return null;
+            }
+        }
+
         return string.IsNullOrEmpty(val) ? (defaultVal ?? "") : val;
     }
 
@@ -88,10 +99,13 @@ public static class ConsoleManager
         var defStr = defaultVal?.ToString("dd.MM.yyyy");
         while (true)
         {
-            var raw = ReadLine(prompt + " (dd.MM.yyyy)", defStr);
+            var raw = ReadLine(prompt + " (dd.MM.yyyy)", defStr, true);
 
             if (raw == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
+            }
 
             if (DateTime.TryParseExact(raw, "dd.MM.yyyy", CultureInfo.InvariantCulture,
                     DateTimeStyles.None, out var dt))
@@ -113,10 +127,13 @@ public static class ConsoleManager
         var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
         while (true)
         {
-            var raw = ReadLine(prompt, defStr);
+            var raw = ReadLine(prompt, defStr, true);
 
             if (raw == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
+            }
 
             if (int.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
@@ -137,10 +154,13 @@ public static class ConsoleManager
         var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
         while (true)
         {
-            var raw = ReadLine(prompt, defStr);
+            var raw = ReadLine(prompt, defStr, true);
 
             if (raw == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
+            }
 
             if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
@@ -161,10 +181,13 @@ public static class ConsoleManager
         var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
         while (true)
         {
-            var raw = ReadLine(prompt, defStr);
+            var raw = ReadLine(prompt, defStr, true);
 
             if (raw == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
+            }
 
             if (long.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
                 return d;
@@ -179,10 +202,13 @@ public static class ConsoleManager
         var defStr = defaultVal?.ToString(CultureInfo.InvariantCulture);
         while (true)
         {
-            var raw = ReadLine(prompt, defStr);
+            var raw = ReadLine(prompt, defStr, true);
 
             if (raw == "/q")
+            {
+                Error("Operace byla zrušena.");
                 return null;
+            }
 
             if (ValidateEmail(raw ?? ""))
                 return raw;

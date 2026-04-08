@@ -12,8 +12,3 @@ class Program
         new App().Run();
     }
 }
-
-/*
- * TODO:
- * Vylepšit zadávání u Enum a ANO/NE
- */
