@@ -219,8 +219,8 @@ public class App
 
         ConsoleManager.Separator();
         ConsoleManager.PrintTable("Faktury", invoiceRepository.Items,
-            $"| {"ID",-4} | {"ČÍSLO",-12} | {"VYSTAVENO",-10} | {"SPLATNOST",-10} | {"CELKEM",-14} | {"DODAVATEL",-20} | {"ODBĚRATEL",-20} |",
-            115);
+            $"| {"ID",-4} | {"ČÍSLO",-12} | {"VYSTAVENO",-10} | {"SPLATNOST",-10} | {"CELKEM",-32} | {"DODAVATEL",-20} | {"ODBĚRATEL",-20} |",
+            130);
     }
 
     /// <summary>

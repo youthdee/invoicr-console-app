@@ -58,7 +58,7 @@ public class Invoice : IObjectWithId<int>
     {
         decimal total = HoursWorked * HourRate;
         return
-            $"| {Id,-4} | {Number,-12} | {IssueDate:dd.MM.yyyy} | {DueDate:dd.MM.yyyy} | {total,10:N2} {Currency,-3} | {Supplier.Name,-20} | {Client.Name,-20} |";
+            $"| {Id,-4} | {Number,-12} | {IssueDate:dd.MM.yyyy} | {DueDate:dd.MM.yyyy} | {total,28:N2} {Currency,-3} | {Supplier.Name,-20} | {Client.Name,-20} |";
     }
 
     /// <summary>
