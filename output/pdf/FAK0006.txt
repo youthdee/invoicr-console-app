@@ -1,0 +1,31 @@
+﻿Faktura: FAK0006
+Poznámka: Vytvořeno 08.04.2026
+==================================================
+Datum vystavení: 08.04.2026
+Datum splatnosti: 22.04.2026
+==================================================
+Odběratel: 1
+IČO: 1
+Plátce DPH: True
+DIČ: 1
+
+Adresa: 1 1, 1 1
+Email: 1
+
+Poznámka: 1
+==================================================
+Dodavatel: test
+IČO: 2
+Plátce DPH: True
+DIČ: 1
+
+Adresa: 1 te, teste dg
+Email: d
+
+Poznámka: test
+==================================================
+Celkem k úhradě: 111 EUR
+Celkem položek (odpracovaných hodin): 111
+Celkem cena za položku vč. DPH: 1
+
+Fakturujeme Vám zboží dle objednávky: 111 EUR, hotově.

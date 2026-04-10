@@ -217,7 +217,7 @@ public static class ConsoleManager
             Console.ResetColor();
         }
     }
-
+    
     /// <summary>
     /// Helper funkce pro vypsání success zprávy.
     /// </summary>

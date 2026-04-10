@@ -156,7 +156,7 @@ public class App
         decimal? rate = ConsoleManager.ReadDecimal("Hodinová sazba (/q pro ukončení)", supplier.HourRate);
         if (rate == null)
             return;
-        int? currency = ConsoleManager.ReadInt("Měna (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 0);
+        int? currency = ConsoleManager.ReadInt("Zadejte měnu (/q pro ukončení)\n     *Zadejte '1' pro EUR, '0' pro CZK (ostatní hodnoty jsou ignorovány)", 0);
         if (currency == null)
             return;
         string? note = ConsoleManager.ReadLine("Poznámka (/q pro ukončení)", $"Vytvořeno {DateTime.Now.ToString("dd.MM.yyyy")}");
@@ -482,7 +482,7 @@ public class App
         if (ico == null)
             return null;
 
-        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE",
+        int? vatPayer = ConsoleManager.ReadInt("Je plátcem DPH? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE (ostatní hodnoty jsou ignorovány)",
             person?.VatPayer is not null ? (person.VatPayer ? 1 : 0) : 1);
         if (vatPayer == null)
             return null;
@@ -554,7 +554,7 @@ public class App
 
         int? hasBankAccount =
             ConsoleManager.ReadInt(
-                "Chcete přidat i bankovní účet? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 1);
+                "Chcete přidat i bankovní účet? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE (ostatní hodnoty jsou ignorovány)", 1);
         if (hasBankAccount == null)
             return null;
 
@@ -573,7 +573,7 @@ public class App
 
             int? hasPrefix =
                 ConsoleManager.ReadInt(
-                    "Přejete si zadat i předčíslí účtu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE", 0);
+                    "Přejete si zadat i předčíslí účtu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE (ostatní hodnoty jsou ignorovány)", 0);
             if (hasPrefix == null)
                 return null;
 
@@ -597,7 +597,7 @@ public class App
 
         int? hasHourRate =
             ConsoleManager.ReadInt(
-                "Přejete si zadat výchozí hodinovou sazbu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE",
+                "Přejete si zadat výchozí hodinovou sazbu? (/q pro ukončení)\n     *Zadejte '1' pro ANO, '0' pro NE (ostatní hodnoty jsou ignorovány)",
                 1);
         if (hasHourRate == null)
             return null;
@@ -610,7 +610,7 @@ public class App
             if (hourRate == null)
                 return null;
 
-            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení)",
+            hourRateCurreny = ConsoleManager.ReadInt("Zadejte měnu hodinové sazby (/q pro ukončení) \n     *Zadejte '1' pro EUR, '0' pro CZK (ostatní hodnoty jsou ignorovány)",
                 (int?)supplier?.HourRateCurrency ?? 0);
             if (hourRateCurreny == null)
                 return null;

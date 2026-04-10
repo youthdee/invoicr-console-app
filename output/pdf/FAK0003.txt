@@ -1,0 +1,28 @@
+﻿Faktura: FAK0003
+==================================================
+Datum vystavení: 4/8/2026 12:00:00 AM
+Datum splatnosti: 4/22/2026 12:00:00 AM
+==================================================
+Odběratel: 1
+IČO: 1
+Plátce DPH: True
+DIČ: 1
+
+Adresa: 1 1, 1 1
+Email: 1
+
+Poznámka: 1
+==================================================
+Dodavatel: test
+IČO: 2
+Plátce DPH: True
+DIČ: 1
+
+Adresa: 1 te, teste dg
+Email: d
+
+Poznámka: test
+==================================================
+Celkem k úhradě: 1 EUR
+Celkem položek (odpracovaných hodin): 1
+Celkem cena za položku vč. DPH: 1
