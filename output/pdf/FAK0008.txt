@@ -1,0 +1,31 @@
+﻿Faktura: FAK0008
+Poznámka: Vytvořeno 20.04.2026
+==================================================
+Datum vystavení: 20.04.2026
+Datum splatnosti: 12.05.2026
+==================================================
+Odběratel: 1
+IČO: 1
+Plátce DPH: True
+DIČ: 1
+
+Adresa: 1 1, 1 1
+Email: 1
+
+Poznámka: 1
+==================================================
+Dodavatel: Jakub Veselý
+IČO: 123456
+Plátce DPH: True
+DIČ: 12356
+
+Adresa: 25242 Jesenice, Kaštanová 1234
+Email: Ahoj@email.cz
+
+Poznámka: Tohle jsem já
+==================================================
+Celkem k úhradě: 35000 CZK
+Celkem položek (odpracovaných hodin): 100
+Celkem cena za položku vč. DPH: 350
+
+Fakturujeme Vám zboží dle objednávky: 35000 CZK, hotově.

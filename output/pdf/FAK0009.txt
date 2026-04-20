@@ -1,0 +1,33 @@
+﻿Faktura: FAK0009
+Poznámka: Testovací faktura
+==================================================
+Datum vystavení: 20.04.2026
+Datum splatnosti: 04.05.2026
+==================================================
+Odběratel: ČZU v Praze
+IČO: 11223344
+Plátce DPH: True
+DIČ: 332211
+
+Adresa: 4321 Praha, Suchdol 1234 432
+Email: czu@czu.cz
+
+Poznámka: Vysoká škola
+==================================================
+Dodavatel: Jakub Veselý
+IČO: 123456
+Plátce DPH: True
+DIČ: 12356
+
+Adresa: 25242 Jesenice, Kaštanová 1234
+Email: Ahoj@email.cz
+
+Bankovní účet: 891717171817/0300
+
+Poznámka: Tohle jsem já
+==================================================
+Celkem k úhradě: 67200 CZK
+Celkem položek (odpracovaných hodin): 168
+Celkem cena za položku vč. DPH: 400
+
+Fakturujeme Vám zboží dle objednávky: 67200 CZK, převodem na bank. účet 891717171817/0300.
